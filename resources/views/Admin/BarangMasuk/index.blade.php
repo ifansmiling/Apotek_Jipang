@@ -13,7 +13,6 @@
 </div>
 <!-- PAGE-HEADER END -->
 
-
 <!-- ROW -->
 <div class="row row-sm">
     <div class="col-lg-12">
@@ -80,10 +79,9 @@
     }
 
     function hapus(data) {
-    $("input[name='bmkode']").val(data.bm_kode);  // Mengisi bm_kode ke input hidden di modal hapus
-    $("#vbm").html("Kode BM " + "<b>" + data.bm_kode + "</b>");
+        $("input[name='bmkode']").val(data.bm_kode);  // Mengisi bm_kode ke input hidden di modal hapus
+        $("#vbm").html("Kode BM " + "<b>" + data.bm_kode + "</b>");
     }
-
 
     function validasi(judul, status) {
         swal({
@@ -92,6 +90,14 @@
             confirmButtonText: "Iya."
         });
     }
+
+    // Tambahkan definisi fungsi getbarangbyidU
+    function getbarangbyidU(kodeBarang) {
+        console.log("Mengambil data barang untuk kode barang: ", kodeBarang);
+        // Tambahkan logika untuk mendapatkan data barang berdasarkan kodeBarang
+        // Misal: AJAX untuk mengambil data dari server
+    }
+
 </script>
 @endsection
 
@@ -105,69 +111,69 @@
 
     var table;
     $(document).ready(function() {
-    // Inisialisasi DataTable
-    table = $('#table-1').DataTable({
-        "processing": true,
-        "serverSide": true,
-        "info": true,
-        "order": [],
-        "scrollX": true,
-        "stateSave": true,
-        "lengthMenu": [
-            [5, 10, 25, 50, 100],
-            [5, 10, 25, 50, 100]
-        ],
-        "pageLength": 10,
-        lengthChange: true,
+        // Inisialisasi DataTable
+        table = $('#table-1').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "info": true,
+            "order": [],
+            "scrollX": true,
+            "stateSave": true,
+            "lengthMenu": [
+                [5, 10, 25, 50, 100],
+                [5, 10, 25, 50, 100]
+            ],
+            "pageLength": 10,
+            lengthChange: true,
 
-        "ajax": {
-            "url": "{{ route('barang-masuk.getbarang-masuk') }}",
-        },
+            "ajax": {
+                "url": "{{ route('barang-masuk.getbarang-masuk') }}",
+            },
 
-        "columns": [{
-                data: 'DT_RowIndex',
-                name: 'DT_RowIndex',
-                searchable: false
-            },
-            {
-                data: 'tgl',
-                name: 'bm_tanggal',
-            },
-            {
-                data: 'bm_kode',
-                name: 'bm_kode',
-            },
-            {
-                data: 'customer',
-                name: 'customer_nama',
-            },
-            {
-                data: 'action',
-                name: 'action',
-                orderable: false,
-                searchable: false
-            },
-        ],
-    });
+            "columns": [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    searchable: false
+                },
+                {
+                    data: 'tgl',
+                    name: 'bm_tanggal',
+                },
+                {
+                    data: 'bm_kode',
+                    name: 'bm_kode',
+                },
+                {
+                    data: 'customer',
+                    name: 'customer_nama',
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
+            ],
+        });
 
-    // Sembunyikan baris dengan bm_kode yang sama
-    table.on('draw', function() {
-        let lastBmKode = null;
+        // Sembunyikan baris dengan bm_kode yang sama
+        table.on('draw', function() {
+            let lastBmKode = null;
 
-        // Iterasi setiap baris yang terlihat
-        table.rows({ filter: 'applied' }).every(function(rowIdx) {
-            const data = this.data();
-            const currentBmKode = data.bm_kode;
+            // Iterasi setiap baris yang terlihat
+            table.rows({ filter: 'applied' }).every(function(rowIdx) {
+                const data = this.data();
+                const currentBmKode = data.bm_kode;
 
-            // Cek apakah bm_kode sama dengan sebelumnya
-            if (lastBmKode === currentBmKode) {
-                $(this.node()).hide(); // Sembunyikan baris
-            } else {
-                lastBmKode = currentBmKode; // Update lastBmKode
-            }
+                // Cek apakah bm_kode sama dengan sebelumnya
+                if (lastBmKode === currentBmKode) {
+                    $(this.node()).hide(); // Sembunyikan baris
+                } else {
+                    lastBmKode = currentBmKode; // Update lastBmKode
+                }
+            });
         });
     });
-});
 
 </script>
 @endsection

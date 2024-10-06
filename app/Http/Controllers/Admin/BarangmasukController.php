@@ -29,63 +29,61 @@ class BarangmasukController extends Controller
     public function show(Request $request)
     {
         if ($request->ajax()) {
-            $data = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangmasuk.customer_id')->leftJoin('tbl_satuan', 'tbl_satuan.satuan_id', '=', 'tbl_barang.satuan_id')->leftJoin('tbl_jenisbarang', 'tbl_jenisbarang.jenisbarang_id', '=', 'tbl_barang.jenisbarang_id')->leftJoin('tbl_merk', 'tbl_merk.merk_id', '=', 'tbl_barang.merk_id')->orderBy('bm_id', 'DESC')->get();
+            $data = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
+                ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangmasuk.customer_id')
+                ->leftJoin('tbl_satuan', 'tbl_satuan.satuan_id', '=', 'tbl_barang.satuan_id')
+                ->leftJoin('tbl_jenisbarang', 'tbl_jenisbarang.jenisbarang_id', '=', 'tbl_barang.jenisbarang_id')
+                ->leftJoin('tbl_merk', 'tbl_merk.merk_id', '=', 'tbl_barang.merk_id')
+                ->orderBy('bm_id', 'DESC')
+                ->get();
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('tgl', function ($row) {
                     $tgl = $row->bm_tanggal == '' ? '-' : Carbon::parse($row->bm_tanggal)->translatedFormat('d F Y');
-
                     return $tgl;
                 })
                 ->addColumn('customer', function ($row) {
                     $customer = $row->customer_id == '' ? '-' : $row->customer_nama;
-
                     return $customer;
                 })
                 ->addColumn('barang', function ($row) {
                     $barang = $row->barang_id == '' ? '-' : $row->barang_nama;
-
                     return $barang;
                 })
                 ->addColumn('satuan', function ($row) {
                     $satuan = $row->barang_id == '' ? '-' : $row->satuan_nama;
-
                     return $satuan;
                 })
                 ->addColumn('jenisbarang', function ($row) {
                     $jenisbarang = $row->barang_id == '' ? '-' : $row->jenisbarang_nama;
-
                     return $jenisbarang;
                 })
                 ->addColumn('merk', function ($row) {
                     $merk = $row->barang_id == '' ? '-' : $row->merk_nama;
-
                     return $merk;
                 })
                 ->addColumn('tglexp', function ($row) {
                     $tglexp = $row->bm_tglex == '' ? '-' : Carbon::parse($row->bm_tglex)->translatedFormat('d F Y');
-
                     return $tglexp;
                 })
                 ->addColumn('harga_jual', function ($row) {
                     $harga_jual = $row->bm_hargajual == '' ? '-' : 'Rp ' . number_format($row->bm_hargajual, 0);
-
                     return $harga_jual;
                 })
                 ->addColumn('harga_beli', function ($row) {
                     $harga_beli = $row->bm_hargabeli == '' ? '-' : 'Rp ' . number_format($row->bm_hargabeli, 0);
-
                     return $harga_beli;
                 })
                 ->addColumn('total_harga', function ($row) {
                     $total_harga = $row->bm_totalharga == '' ? '-' : 'Rp ' . number_format($row->bm_totalharga, 0);
-
                     return $total_harga;
                 })
                 ->addColumn('action', function ($row) {
+                    // Siapkan data untuk tombol
                     $array = array(
                         "bm_id" => $row->bm_id,
-                        "bm_kode" => $row->bm_kode,
+                        "bm_kode" => $row->bm_kode, // Ini adalah ID nota yang diganti
                         "barang_kode" => trim(preg_replace('/[^A-Za-z0-9-]+/', '_', $row->barang_kode)),
                         "customer_id" => $row->customer_id,
                         "bm_tanggal" => $row->bm_tanggal,
@@ -98,29 +96,40 @@ class BarangmasukController extends Controller
                         "bm_etalase" => $row->bm_etalase,
                         "bm_ltkgudang" => $row->bm_ltkgudang,
                         "bm_ltketalase" => $row->bm_ltketalase,
-
-
                     );
+
                     $button = '';
-                    $hakEdit = AksesModel::leftJoin('tbl_submenu', 'tbl_submenu.submenu_id', '=', 'tbl_akses.submenu_id')->where(array('tbl_akses.role_id' => Session::get('user')->role_id, 'tbl_submenu.submenu_judul' => 'Barang Masuk', 'tbl_akses.akses_type' => 'update'))->count();
-                    $hakDelete = AksesModel::leftJoin('tbl_submenu', 'tbl_submenu.submenu_id', '=', 'tbl_akses.submenu_id')->where(array('tbl_akses.role_id' => Session::get('user')->role_id, 'tbl_submenu.submenu_judul' => 'Barang Masuk', 'tbl_akses.akses_type' => 'delete'))->count();
+                    $hakEdit = AksesModel::leftJoin('tbl_submenu', 'tbl_submenu.submenu_id', '=', 'tbl_akses.submenu_id')
+                        ->where(array('tbl_akses.role_id' => Session::get('user')->role_id, 'tbl_submenu.submenu_judul' => 'Barang Masuk', 'tbl_akses.akses_type' => 'update'))->count();
+
+                    $hakDelete = AksesModel::leftJoin('tbl_submenu', 'tbl_submenu.submenu_id', '=', 'tbl_akses.submenu_id')
+                        ->where(array('tbl_akses.role_id' => Session::get('user')->role_id, 'tbl_submenu.submenu_judul' => 'Barang Masuk', 'tbl_akses.akses_type' => 'delete'))->count();
+
                     if ($hakEdit > 0 && $hakDelete > 0) {
                         $button .= '
                         <div class="g-2">
-                        <a class="btn modal-effect text-primary btn-sm" data-bs-effect="effect-super-scaled" data-bs-toggle="modal" href="#Umodaldemo8" data-bs-toggle="tooltip" data-bs-original-title="Edit" onclick=update(' . json_encode($array) . ')><span class="fe fe-edit text-success fs-14"></span></a>
-                        <a class="btn modal-effect text-danger btn-sm" data-bs-effect="effect-super-scaled" data-bs-toggle="modal" href="#Hmodaldemo8" onclick=hapus(' . json_encode($array) . ')><span class="fe fe-trash-2 fs-14"></span></a>
+                            <a class="btn modal-effect text-primary btn-sm" data-bs-effect="effect-super-scaled" data-bs-toggle="modal" href="#Umodaldemo8" data-bs-toggle="tooltip" data-bs-original-title="Edit" onclick=update(' . json_encode($array) . ')>
+                                <span class="fe fe-edit text-success fs-14"></span>
+                            </a>
+                            <a class="btn modal-effect text-danger btn-sm" data-bs-effect="effect-super-scaled" data-bs-toggle="modal" href="#Hmodaldemo8" onclick=hapus(' . json_encode($array) . ')>
+                                <span class="fe fe-trash-2 fs-14"></span>
+                            </a>
                         </div>
                         ';
                     } else if ($hakEdit > 0 && $hakDelete == 0) {
                         $button .= '
                         <div class="g-2">
-                            <a class="btn modal-effect text-primary btn-sm" data-bs-effect="effect-super-scaled" data-bs-toggle="modal" href="#Umodaldemo8" data-bs-toggle="tooltip" data-bs-original-title="Edit" onclick=update(' . json_encode($array) . ')><span class="fe fe-edit text-success fs-14"></span></a>
+                            <a class="btn modal-effect text-primary btn-sm" data-bs-effect="effect-super-scaled" data-bs-toggle="modal" href="#Umodaldemo8" data-bs-toggle="tooltip" data-bs-original-title="Edit" onclick=update(' . json_encode($array) . ')>
+                                <span class="fe fe-edit text-success fs-14"></span>
+                            </a>
                         </div>
                         ';
                     } else if ($hakEdit == 0 && $hakDelete > 0) {
                         $button .= '
                         <div class="g-2">
-                        <a class="btn modal-effect text-danger btn-sm" data-bs-effect="effect-super-scaled" data-bs-toggle="modal" href="#Hmodaldemo8" onclick=hapus(' . json_encode($array) . ')><span class="fe fe-trash-2 fs-14"></span></a>
+                            <a class="btn modal-effect text-danger btn-sm" data-bs-effect="effect-super-scaled" data-bs-toggle="modal" href="#Hmodaldemo8" onclick=hapus(' . json_encode($array) . ')>
+                                <span class="fe fe-trash-2 fs-14"></span>
+                            </a>
                         </div>
                         ';
                     } else {
@@ -128,9 +137,11 @@ class BarangmasukController extends Controller
                     }
                     return $button;
                 })
-                ->rawColumns(['action', 'tgl', 'customer', 'barang', 'satuan', 'jenisbarang', 'merk', 'tglexp', 'harga_jual', 'harga_beli', 'total_harga'])->make(true);
+                ->rawColumns(['action', 'tgl', 'customer', 'barang', 'satuan', 'jenisbarang', 'merk', 'tglexp', 'harga_jual', 'harga_beli', 'total_harga'])
+                ->make(true);
         }
     }
+
 
     public function proses_tambah(Request $request)
     {
@@ -160,58 +171,33 @@ class BarangmasukController extends Controller
     
         return response()->json(['success' => 'Berhasil']);
     }  
-
-    public function getBarangByNota($bm_kode)
-    {
-        // Mencari semua barang masuk berdasarkan bm_kode
-        $barangMasuk = BarangmasukModel::with('barang') // Mengambil relasi barang
-            ->where('bm_kode', $bm_kode)
-            ->get();
-
-        if ($barangMasuk->isEmpty()) {
-            return response()->json(['message' => 'Data tidak ditemukan'], 404);
-        }
-
-        return response()->json($barangMasuk->toArray(), 200); // Ubah ke array untuk JSON
-    }
-
-
+    
     public function proses_ubah(Request $request, BarangmasukModel $barangmasuk)
     {
-        $data = $request->validate([
-            'nmbarangEdit' => 'required|array',
-            'jmlEdit' => 'required|array',
-            'hargajualEdit' => 'required|array',
-            'hargabeliEdit' => 'required|array',
-            'tglkadaluarsaEdit' => 'required|array',
-            'customer' => 'required',
+        // Validasi data
+        $request->validate([
             'tglmasuk' => 'required|date',
-            'bmkode' => 'required',
+            'barang' => 'required',
+            'customer' => 'required',
+            'jml' => 'required|integer|min:1',
+            'hargajual' => 'required|numeric|min:0',
+            'hargabeli' => 'required|numeric|min:0',
+            'totalharga' => 'required|numeric|min:0',
         ]);
 
-        // Proses setiap barang yang diedit
-        for ($i = 0; $i < count($data['nmbarangEdit']); $i++) {
-            $inputData = [
-                'bm_tanggal' => $data['tglmasuk'],
-                'customer_id' => $data['customer'],
-                'barang_kode' => $data['nmbarangEdit'][$i], // Ganti sesuai kunci yang tepat
-                'bm_jumlah' => $data['jmlEdit'][$i],
-                'bm_tglex' => $data['tglkadaluarsaEdit'][$i],
-                'bm_hargajual' => $data['hargajualEdit'][$i],
-                'bm_hargabeli' => $data['hargabeliEdit'][$i],
-                // Tambahkan kolom lain jika perlu
-            ];
+        // Update data
+        $barangmasuk->update([
+            'bm_tanggal' => $request->tglmasuk,
+            'barang_kode' => $request->barang,
+            'customer_id' => $request->customer,
+            'bm_jumlah' => $request->jml,
+            'bm_hargajual' => $request->hargajual,
+            'bm_hargabeli' => $request->hargabeli,
+            'bm_totalharga' => $request->totalharga,
+        ]);
 
-            // Update atau buat entri baru sesuai kebutuhan
-            BarangmasukModel::updateOrCreate(
-                ['bm_kode' => $data['bmkode'], 'barang_kode' => $inputData['barang_kode']], // kriteria pencarian
-                $inputData // data yang akan diupdate atau dibuat
-            );
-        }
-
-        return response()->json(['success' => 'Data berhasil diubah']);
+        return response()->json(['success' => 'Berhasil']);
     }
-
     
     public function proses_hapus($bm_kode)
     {
@@ -227,6 +213,5 @@ class BarangmasukController extends Controller
 
         return response()->json(['message' => 'Data tidak ditemukan'], 404);
     }
-
 
 }

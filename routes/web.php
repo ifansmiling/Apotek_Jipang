@@ -108,7 +108,6 @@ Route::group(['middleware' => 'userlogin'], function () {
         Route::post('/admin/barang-masuk/proses_hapus/{barangmasuk}', [BarangmasukController::class, 'proses_hapus']);
         Route::get('/admin/barang/getbarang/{id}', [BarangController::class, 'getbarang']);
         Route::get('/admin/barang/listbarang/{param}', [BarangController::class, 'listbarang']);
-        Route::get('barangmasuk/{bm_kode}', [BarangmasukController::class, 'getBarangByNota']);
     });
 
     Route::middleware(['checkRoleUser:/persediaan,menu'])->group(function () {
