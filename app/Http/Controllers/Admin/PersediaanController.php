@@ -126,7 +126,6 @@ class PersediaanController extends Controller
                         "bm_id" => $row->bm_id,
                         "bm_kode" => $row->bm_kode,                        
                         "barang_kode" => trim(preg_replace('/[^A-Za-z0-9-]+/', '_', $row->barang_kode)),
-
                         "customer_id" => $row->customer_id,
                         "bm_tanggal" => $row->bm_tanggal,
                         "bm_jumlah" => $row->bm_jumlah,
@@ -261,51 +260,56 @@ class PersediaanController extends Controller
 
     public function proses_ubah(Request $request, BarangmasukModel $barangmasuk)
     {
-        $validatedData = $request->validate([
-            'bmkode' => 'required',
-            'tglmasuk' => 'required|date',
-            'barang' => 'required',
-            'customer' => 'required',
-            'jml' => 'required|numeric',
-            'tglkadaluarsa' => 'required|date',
-            'hargajual' => 'required|numeric',
-            'hargabeli' => 'required|numeric',
-            'totalstok' => 'required|numeric',
-            'etalase' => 'required|numeric',
-            'letakG' => 'required|string',
-            'letakE' => 'required|string',
-        ]);
+        
+            $validatedData = $request->validate([
+                'bm_kode' => 'required',
+                'tgl_masuk' => 'required|date',
+                'barang_kode' => 'required',
+                'customer_id' => 'required',
+                'jml_masuk' => 'required|numeric',
+                'tgl_kadaluarsa' => 'required|date',
+                'harga_jual' => 'required|numeric',
+                'harga_beli' => 'required|numeric',
+                'total_stok' => 'required|numeric',
+                'etalase' => 'required|numeric',
+                'letak_gudang' => 'required|string',
+                'letak_etalase' => 'required|string',
+            ]);
 
-        $barangmasuk->update([
-            'bm_kode' => $validatedData['bmkode'],
-            'tgl_masuk' => $validatedData['tglmasuk'],
-            'barang_kode' => $validatedData['barang'],
-            'customer_id' => $validatedData['customer'],
-            'jml_masuk' => $validatedData['jml'],
-            'tgl_kadaluarsa' => $validatedData['tglkadaluarsa'],
-            'harga_jual' => $validatedData['hargajual'],
-            'harga_beli' => $validatedData['hargabeli'],
-            'total_stok' => $validatedData['totalstok'],
-            'etalase' => $validatedData['etalase'],
-            'letak_gudang' => $validatedData['letakG'],
-            'letak_etalase' => $validatedData['letakE'],
-        ]);
+            $validatedData['barang_kode'] = str_replace(' ', '_', strtolower(trim(preg_replace('/[^A-Za-z0-9\s-]+/', '-', $validatedData['barang_kode']))));
 
-        return response()->json(['success' => true]);
+            $barangmasuk->update([
+                'bm_kode' => $validatedData['bm_kode'],
+                'bm_tanggal' => $validatedData['tgl_masuk'],
+                'barang_kode' => $validatedData['barang_kode'],
+                'customer_id' => $validatedData['customer_id'],
+                'bm_jumlah' => $validatedData['jml_masuk'],
+                'bm_tglex' => $validatedData['tgl_kadaluarsa'],
+                'bm_hargajual' => $validatedData['harga_jual'],
+                'bm_hargabeli' => $validatedData['harga_beli'],
+                'bm_stok' => $validatedData['total_stok'],
+                'bm_etalase' => $validatedData['etalase'],
+                'bm_ltkgudang' => $validatedData['letak_gudang'],
+                'bm_ltketalase' => $validatedData['letak_etalase'],
+            ]);            
+
+            return response()->json(['success' => true]);
     }
 
     public function hapus($id)
     {
         try {
             \Log::info('ID diterima: ' . $id);
-            $barangmasuk = BarangmasukModel::where('bm_kode', $id)->first();
-    
+
+            // Cari data barang masuk berdasarkan primary key (bm_id)
+            $barangmasuk = BarangmasukModel::find($id);
+
             if ($barangmasuk) {
                 \Log::info('Data ditemukan, akan dihapus');
                 $barangmasuk->delete();
                 return response()->json(['success' => true, 'message' => 'Data berhasil dihapus']);
             }
-    
+
             \Log::warning('Data tidak ditemukan');
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan']);
         } catch (\Exception $e) {
@@ -313,8 +317,6 @@ class PersediaanController extends Controller
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus data']);
         }
     }
-    
-
 }
 
 

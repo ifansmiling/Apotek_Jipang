@@ -3,7 +3,10 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content modal-content-demo">
             <div class="modal-header">
-                <h6 class="modal-title">Ubah Obat Masuk</h6><button aria-label="Close" onclick="resetU()" class="btn-close" data-bs-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                <h6 class="modal-title">Ubah Obat Masuk</h6>
+                <button aria-label="Close" onclick="resetU()" class="btn-close" data-bs-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -98,14 +101,12 @@
                     <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                     Loading...
                 </button>
-                <a href="javascript:void(0)" onclick="checkFormU()" id="btnSimpanU" class="btn btn-success">Simpan
-                    Perubahan <i class="fe fe-check"></i></a>
+                <a href="javascript:void(0)" onclick="checkFormU()" id="btnSimpanU" class="btn btn-success">Simpan Perubahan <i class="fe fe-check"></i></a>
                 <a href="javascript:void(0)" class="btn btn-light" onclick="resetU()" data-bs-dismiss="modal">Batal <i class="fe fe-x"></i></a>
             </div>
         </div>
     </div>
 </div>
-
 
 @section('formEditJS')
 <script>
@@ -124,11 +125,6 @@
         table2.ajax.reload();
     }
 
-    function searchBarangU() {
-        getbarangbyidU($('input[name="kdbarangU"]').val());
-        resetValidU();
-    }
-
     function getbarangbyidU(id) {
         $("#loaderkdU").removeClass('d-none');
         $.ajax({
@@ -140,14 +136,12 @@
             success: function(data) {
                 if (data.length > 0) {
                     $("#loaderkdU").addClass('d-none');
-                    $("#statusU").val("true");
                     $("#nmbarangU").val(data[0].barang_nama);
                     $("#satuanU").val(data[0].satuan_nama);
                     $("#jenisU").val(data[0].jenisbarang_nama);
                     $("#merkU").val(data[0].merk_nama);
                 } else {
                     $("#loaderkdU").addClass('d-none');
-                    $("#statusU").val("false");
                     $("#nmbarangU").val('');
                     $("#satuanU").val('');
                     $("#jenisU").val('');
@@ -159,195 +153,107 @@
 
     let totalStokAwalU;
 
-    // Fungsi untuk menghitung total stok
     function hitungTotalStokU() {
         const totalStokSebelumnya = totalStokAwalU || parseInt($("input[name='totalstokU']").val());
         const etalase = parseInt($("input[name='etalaseU']").val()) || 0;
         
-        
-        // Hitung total stok
         let totalStok;
         if (totalStokAwalU == 0 && etalase > 0){
             totalStok = 0;
         }else if (totalStokAwalU == 0 && etalase < 0){
             totalStok = -etalase;
         }else{
-            totalStok =  totalStokSebelumnya - etalase;
+            totalStok = totalStokSebelumnya - etalase;
         }
 
-        // Tampilkan total stok di input
         $("input[name='totalstokU']").val(totalStok);
     }
 
-    // Panggil fungsi hitungTotalStokU setiap kali ada perubahan di input jumlah masuk atau etalase
     $("input[name='etalaseU']").on('input', function() {
-        // Simpan total stok awal sebelum ada perubahan
         if (!totalStokAwalU) {
             totalStokAwalU = parseInt($("input[name='totalstokU']").val());
         }
         hitungTotalStokU();
     });
 
-    // Reset totalStokAwalU saat Anda mengetik input baru
-    $("input[name='totalstokU']").on('input', function() {
-        totalStokAwalU = null;
-    });
-
+    function resetU() {
+        $('input[name="idbmU"]').val("");
+        $('input[name="bmkodeU"]').val("");
+        $('input[name="totalhargaU"]').val("");
+        $('input[name="jmlU"]').val("");
+        $('input[name="kdbarangU"]').val("");
+        $('input[name="tglkadaluarsaU"]').val("");
+        $('input[name="nmbarangU"]').val("");
+        $('input[name="satuanU"]').val("");
+        $('input[name="jenisU"]').val("");
+        $('input[name="merkU"]').val("");
+        $('input[name="etalaseU"]').val("");
+        $('input[name="letakGU"]').val("");
+        $('input[name="letakEU"]').val("");
+        $('input[name="totalstokU"]').val("");
+        $('input[name="hargajualU"]').val("");
+        $('input[name="hargabeliU"]').val("");
+        $('select[name="customerU"]').val("").trigger("change");
+        $('input[name="tglmasukU"]').val("");
+    }
 
     function checkFormU() {
-        const tglmasuk = $("input[name='tglmasukU']").val();
-        const status = $("#statusU").val();
-        const kdbarang = $("input[name='kdbarangU").val();
-        const customer = $("select[name='customerU']").val();
-        const jml = parseInt($("input[name='jmlU']").val());
-        const tglkadaluarsa = $("input[name='tglkadaluarsaU']").val();
-        const hargajual = $("input[name='hargajualU']").val();
-        const hargabeli = $("input[name='hargabeliU']").val();
-        const totalstok = $("input[name='totalstokU']").val();
-        const etalase = $("input[name='etalaseU']").val();
-        const letakG = $("input[name='letakGU']").val();
-        const letakE = $("input[name='letakEU']").val();
-        setLoadingU(true);
-        resetValidU();
+        const isEmptyField = !$('input[name="bmkodeU"]').val() || 
+                            !$('input[name="tglmasukU"]').val() || 
+                            !$('select[name="customerU"]').val() || 
+                            !$('input[name="kdbarangU"]').val() ||
+                            !$('input[name="jmlU"]').val() ||
+                            !$('input[name="tglkadaluarsaU"]').val() || 
+                            !$('input[name="hargajualU"]').val() ||
+                            !$('input[name="hargabeliU"]').val() ||
+                            !$('input[name="totalstokU"]').val();
 
-        const maxNegativeEtalase = -(jml - totalStokAwalU); // Hitung nilai maksimum etalase negatif yang diperbolehkan
-
-
-        if (parseInt(etalase) > totalStokAwalU) { 
-            validasi('stok tidak cukup !', 'warning');
-            $("input[name='etalaseU']").addClass('is-invalid');
-            setLoadingU(false);
+        if (isEmptyField) {
+            swal("Terjadi Kesalahan!", "Mohon Lengkapi Form Inputan yang Bertanda *", "error");
             return false;
-        } else if (parseInt(etalase) < maxNegativeEtalase) { 
-            validasi('Nilai etalase tidak valid!', 'warning');
-            $("input[name='etalaseU']").addClass('is-invalid');
-            setLoadingU(false);
-            return false;
-        } else if (letakG == "") {
-            validasi('Letak Gudang wajib di isi!', 'warning');
-            $("input[name='letakGU']").addClass('is-invalid');
-            setLoadingU(false);
-            return false;
-        } else if (letakE == "") {
-            validasi('Letak Etalase wajib di isi!', 'warning');
-            $("input[name='letakEU']").addClass('is-invalid');
-            setLoadingU(false);
-            return false;
-        } else {
-            submitFormU();
         }
+
+        $("#btnSimpanU").addClass('d-none');
+        $("#btnLoaderU").removeClass('d-none');
+
+        submitFormU();
     }
 
     function submitFormU() {
-    const id = $("input[name='idbmU']").val();
-    const bmkode = $("input[name='bmkodeU']").val();
-    const tglmasuk = $("input[name='tglmasukU']").val();
-    const kdbarang = $("input[name='kdbarangU']").val();
-    const customer = $("select[name='customerU']").val();
-    const jml = $("input[name='jmlU']").val();
-    const tglkadaluarsa = $("input[name='tglkadaluarsaU']").val();
-    const hargajual = $("input[name='hargajualU']").val();
-    const hargabeli = $("input[name='hargabeliU']").val();
-    const totalstok = $("input[name='totalstokU']").val();
-    const etalase = $("input[name='etalaseU']").val();
-    const letakG = $("input[name='letakGU']").val();
-    const letakE = $("input[name='letakEU']").val();
+        const id = $("input[name='idbmU']").val();
+        const data = {
+            bm_kode: $("input[name='bmkodeU']").val(),
+            tgl_masuk: $("input[name='tglmasukU']").val(),
+            barang_kode: $("input[name='kdbarangU']").val(),
+            customer_id: $("select[name='customerU']").val(),
+            jml_masuk: $("input[name='jmlU']").val(),
+            tgl_kadaluarsa: $("input[name='tglkadaluarsaU']").val(),
+            harga_jual: $("input[name='hargajualU']").val(),
+            harga_beli: $("input[name='hargabeliU']").val(),
+            total_stok: $("input[name='totalstokU']").val(),
+            etalase: $("input[name='etalaseU']").val(),
+            letak_gudang: $("input[name='letakGU']").val(),
+            letak_etalase: $("input[name='letakEU']").val(),
+        };
 
-    hitungTotalStokU();
-
-    console.log("Data yang dikirim:", {
-        bmkode: bmkode,
-        tglmasuk: tglmasuk,
-        barang: kdbarang,
-        customer: customer,
-        jml: jml,
-        tglkadaluarsa: tglkadaluarsa,
-        hargajual: hargajual,
-        hargabeli: hargabeli,
-        totalstok: totalstok,
-        etalase: etalase,
-        letakG: letakG,
-        letakE: letakE,
-    });
-
-    $.ajax({
-        type: 'POST',
-        url: "{{ url('admin/persediaan/proses_ubah') }}/" + id,
-        enctype: 'multipart/form-data',
-        data: {
-            bmkode: bmkode,
-            tglmasuk: tglmasuk,
-            barang: kdbarang,
-            customer: customer,
-            jml: jml,
-            tglkadaluarsa: tglkadaluarsa,
-            hargajual: hargajual,
-            hargabeli: hargabeli,
-            totalstok: totalstok,
-            etalase: etalase,
-            letakG: letakG,
-            letakE: letakE,
-        },
-        success: function(data) {
-            swal({
-                title: "Berhasil diubah!",
-                type: "success"
-            });
-            $('#Umodaldemo8').modal('toggle');
-            table.ajax.reload(null, false);
-            resetU();
-        }
-    });
-}
-
-
-    function resetValidU() {
-        $("input[name='tglmasukU']").removeClass('is-invalid');
-        $("input[name='kdbarangU']").removeClass('is-invalid');
-        $("select[name='customerU']").removeClass('is-invalid');
-        $("input[name='jmlU']").removeClass('is-invalid');
-        $("input[name='tglkadaluarsaU']").removeClass('is-invalid');
-        $("input[name='hargajualU']").removeClass('is-invalid');
-        $("input[name='hargabeliU']").removeClass('is-invalid');
-        $("input[name='totalstokU']").removeClass('is-invalid');
-        $("input[name='etalaseU']").removeClass('is-invalid');
-        $("input[name='letakGU']").removeClass('is-invalid');
-        $("input[name='letakEU']").removeClass('is-invalid');
-    };
-
-    function resetU() {
-        resetValidU();
-        $("input[name='idbmU']").val('');
-        $("input[name='bmkodeU']").val('');
-        $("input[name='tglmasukU']").val('');
-        $("input[name='kdbarangU']").val('');
-        $("select[name='customerU']").val('');
-        $("input[name='jmlU']").val('');
-        $("input[name='tglkadaluarsaU']").val('');
-        $("input[name='hargajualU']").val('');
-        $("input[name='hargabeliU']").val('');
-        $("input[name='totalstokU']").val('');
-        $("input[name='etalaseU']").val('');
-        $("input[name='letakGU']").val('');
-        $("input[name='letakEU']").val('');
-        $("#nmbarangU").val('');
-        $("#satuanU").val('');
-        $("#jenisU").val('');
-        $("#merkU").val('');
-        $("#statusU").val('false');
-        totalStokAwalU = null;
-        hitungTotalStokU();
-        setLoadingU(false);
-    }
-
-    function setLoadingU(bool) {
-        if (bool == true) {
-            $('#btnLoaderU').removeClass('d-none');
-            $('#btnSimpanU').addClass('d-none');
-        } else {
-            $('#btnSimpanU').removeClass('d-none');
-            $('#btnLoaderU').addClass('d-none');
-        }
+        $.ajax({
+            type: 'POST',
+            url: "{{ url('admin/persediaan/proses_ubah/data/') }}/" + id,
+            data: data,
+            success: function(response) {
+                if (response.success) {
+                    swal("Berhasil diubah!", "", "success");
+                    $('#Umodaldemo8').modal('toggle');
+                    table.ajax.reload(null, false);
+                    resetU();
+                } else {
+                    swal("Gagal!", "Periksa kembali inputan Anda.", "error");
+                }
+            },
+            error: function() {
+                swal("Terjadi kesalahan!", "Coba lagi nanti.", "error");
+            }
+        });
     }
 </script>
 @endsection

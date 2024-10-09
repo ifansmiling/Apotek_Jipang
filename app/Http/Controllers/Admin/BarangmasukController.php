@@ -145,7 +145,7 @@ class BarangmasukController extends Controller
 
     public function proses_tambah(Request $request)
     {
-        // Ambil data dari $request
+        
         $bmkode = $request->bmkode;
         $tglmasuk = $request->tglmasuk;
         $customer = $request->customer;
