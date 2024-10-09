@@ -9,6 +9,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <input type="hidden" name="idbmU">
+                        <input type="hidden" name="totalhargaU" value="">
                         <div class="form-group">
                             <label for="bmkodeU" class="form-label">Kode Obat Masuk <span class="text-danger">*</span></label>
                             <input type="text" name="bmkodeU" readonly class="form-control" placeholder="">
@@ -29,12 +30,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Kode Obat <span class="text-danger me-1">*</span>
-                                <input type="hidden" id="statusU" value="true">
-                                <div class="spinner-border spinner-border-sm d-none" id="loaderkdU" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </label>
+                            <label>Kode Obat <span class="text-danger me-1">*</span></label>
                             <div class="input-group">
                                 <input type="text" class="form-control" autocomplete="off" name="kdbarangU" placeholder="" readonly>
                             </div>
@@ -65,7 +61,6 @@
                             <label for="jmlU" class="form-label">Jumlah Masuk (/Satuan) <span class="text-danger">*</span></label>
                             <input type="text" name="jmlU" class="form-control" readonly>
                         </div>
-                        <!-- Tambahan kolom baru -->
                         <div class="form-group">
                             <label for="tglkadaluarsaU" class="form-label">Tanggal Kadaluarsa <span class="text-danger">*</span></label>
                             <input type="text" name="tglkadaluarsaU" class="form-control datepicker-date" readonly>
@@ -110,6 +105,7 @@
         </div>
     </div>
 </div>
+
 
 @section('formEditJS')
 <script>
@@ -234,7 +230,7 @@
             return false;
         } else if (letakE == "") {
             validasi('Letak Etalase wajib di isi!', 'warning');
-            $("select[name='letakEU']").addClass('is-invalid');
+            $("input[name='letakEU']").addClass('is-invalid');
             setLoadingU(false);
             return false;
         } else {
@@ -243,50 +239,67 @@
     }
 
     function submitFormU() {
-        const id = $("input[name='idbmU']").val();
-        const bmkode = $("input[name='bmkodeU']").val();
-        const tglmasuk = $("input[name='tglmasukU']").val();
-        const kdbarang = $("input[name='kdbarangU']").val();
-        const customer = $("select[name='customerU']").val();
-        const jml = $("input[name='jmlU']").val();
-        const tglkadaluarsa = $("input[name='tglkadaluarsaU']").val();
-        const hargajual = $("input[name='hargajualU']").val();
-        const hargabeli = $("input[name='hargabeliU']").val();
-        const totalstok = $("input[name='totalstokU']").val();
-        const etalase = $("input[name='etalaseU']").val();
-        const letakG = $("input[name='letakGU']").val();
-        const letakE = $("input[name='letakEU']").val();
-        hitungTotalStokU();
+    const id = $("input[name='idbmU']").val();
+    const bmkode = $("input[name='bmkodeU']").val();
+    const tglmasuk = $("input[name='tglmasukU']").val();
+    const kdbarang = $("input[name='kdbarangU']").val();
+    const customer = $("select[name='customerU']").val();
+    const jml = $("input[name='jmlU']").val();
+    const tglkadaluarsa = $("input[name='tglkadaluarsaU']").val();
+    const hargajual = $("input[name='hargajualU']").val();
+    const hargabeli = $("input[name='hargabeliU']").val();
+    const totalstok = $("input[name='totalstokU']").val();
+    const etalase = $("input[name='etalaseU']").val();
+    const letakG = $("input[name='letakGU']").val();
+    const letakE = $("input[name='letakEU']").val();
 
-        $.ajax({
-            type: 'POST',
-            url: "{{ url('admin/barang-masuk/proses_ubah') }}/" + id,
-            enctype: 'multipart/form-data',
-            data: {
-                bmkode: bmkode,
-                tglmasuk: tglmasuk,
-                barang: kdbarang,
-                customer: customer,
-                jml: jml,
-                tglkadaluarsa: tglkadaluarsa,
-                hargajual: hargajual,
-                hargabeli: hargabeli,
-                totalstok: totalstok,
-                etalase: etalase,
-                letakG: letakG,
-                letakE: letakE
-            },
-            success: function(data) {
-                swal({
-                    title: "Berhasil diubah!",
-                    type: "success"
-                });
-                $('#Umodaldemo8').modal('toggle');
-                table.ajax.reload(null, false);
-                resetU();
-            }
-        });
-    }
+    hitungTotalStokU();
+
+    console.log("Data yang dikirim:", {
+        bmkode: bmkode,
+        tglmasuk: tglmasuk,
+        barang: kdbarang,
+        customer: customer,
+        jml: jml,
+        tglkadaluarsa: tglkadaluarsa,
+        hargajual: hargajual,
+        hargabeli: hargabeli,
+        totalstok: totalstok,
+        etalase: etalase,
+        letakG: letakG,
+        letakE: letakE,
+    });
+
+    $.ajax({
+        type: 'POST',
+        url: "{{ url('admin/persediaan/proses_ubah') }}/" + id,
+        enctype: 'multipart/form-data',
+        data: {
+            bmkode: bmkode,
+            tglmasuk: tglmasuk,
+            barang: kdbarang,
+            customer: customer,
+            jml: jml,
+            tglkadaluarsa: tglkadaluarsa,
+            hargajual: hargajual,
+            hargabeli: hargabeli,
+            totalstok: totalstok,
+            etalase: etalase,
+            letakG: letakG,
+            letakE: letakE,
+        },
+        success: function(data) {
+            swal({
+                title: "Berhasil diubah!",
+                type: "success"
+            });
+            $('#Umodaldemo8').modal('toggle');
+            table.ajax.reload(null, false);
+            resetU();
+        }
+    });
+}
+
 
     function resetValidU() {
         $("input[name='tglmasukU']").removeClass('is-invalid');
@@ -310,7 +323,7 @@
         $("input[name='kdbarangU']").val('');
         $("select[name='customerU']").val('');
         $("input[name='jmlU']").val('');
-        $("input[name='tglkadaluarsaU]").val('');
+        $("input[name='tglkadaluarsaU']").val('');
         $("input[name='hargajualU']").val('');
         $("input[name='hargabeliU']").val('');
         $("input[name='totalstokU']").val('');

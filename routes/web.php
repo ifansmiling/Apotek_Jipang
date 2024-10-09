@@ -115,10 +115,10 @@ Route::group(['middleware' => 'userlogin'], function () {
         Route::resource('/admin/persediaan', \App\Http\Controllers\Admin\PersediaanController::class);
         Route::get('/admin/persediaan/show/', [PersediaanController::class, 'show'])->name('persediaan.getpersediaan');
         Route::post('/admin/persediaan/proses_tambah/', [PersediaanController::class, 'proses_tambah'])->name('persediaan.store');
-        Route::post('/admin/persediaan/proses_ubah/{barangmasuk}', [PersediaanController::class, 'proses_ubah']);
-        Route::post('/admin/persediaan/proses_hapus/{barangmasuk}', [PersediaanController::class, 'proses_hapus']);
         Route::get('/admin/barang/getbarang/{id}', [BarangController::class, 'getbarang']);
         Route::get('/admin/barang/listbarang/{param}', [BarangController::class, 'listbarang']);
+        Route::post('/admin/persediaan/proses_ubah/{barangmasuk}', [PersediaanController::class, 'proses_ubah'])->name('persediaan.proses_ubah');
+        Route::post('/admin/barang-masuk/proses_hapus/{id}', [PersediaanController::class, 'hapus'])->name('persediaan.proses_hapus');
     });
 
     Route::middleware(['checkRoleUser:/barang-keluar,submenu'])->group(function () {
