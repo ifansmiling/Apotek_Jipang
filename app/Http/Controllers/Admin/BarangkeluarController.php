@@ -131,133 +131,129 @@ class BarangkeluarController extends Controller
     }
 
     public function proses_tambah(Request $request)
-{
-    try {
-        // Validasi input
-        $request->validate([
-            'tglkeluar' => 'required',
-            'bkkode' => 'required',
-            'kdbarang' => 'required',
-            'tujuan' => 'required',
-            'jml' => 'required|numeric',
-            'bmkode' => 'required',
-        ]);
-
-        // Ambil harga jual dari database berdasarkan BM Kode yang baru dipilih
-        $barangMasuk = BarangmasukModel::where('bm_kode', $request->bmkode)->first();
-        $hargaJual = $barangMasuk->bm_hargajual;
-
-        $barangMasuk->bm_etalase -= $request->jml;
-        $barangMasuk->save();
-        // Hitung harga total berdasarkan jumlah keluar dan harga jual
-        $hargatotal = $request->jml * $hargaJual;
-
-        // Buat slug dari string tujuan
-        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->tujuan)));
-
-        // Cek apakah data dengan kriteria yang sama sudah ada
-        $existingData = BarangkeluarModel::where('bk_tanggal', $request->tglkeluar)
-            ->where('bk_tujuan', $request->tujuan)
-            ->where('bm_kode', $request->bmkode)
-            ->where('barang_kode', $request->kdbarang)
-            ->first();
-
-        if ($existingData) {
-            // Jika data sudah ada, tambahkan jumlah barang keluar dan total harga
-            $existingData->increment('bk_jumlah', $request->jml);
-            $existingData->increment('bk_totalharga', $hargatotal);
-        } else {
-            // Jika data belum ada, tambahkan data baru
-            BarangkeluarModel::create([
-                'bk_tanggal' => $request->tglkeluar,
-                'bk_kode' => $request->bkkode,
-                'barang_kode' => $request->kdbarang,
-                'bk_tujuan' => $request->tujuan,
-                'bk_jumlah' => $request->jml,
-                'bm_kode' => $request->bmkode,
-                'bk_totalharga' => $hargatotal,
-                'bk_slug' => $slug, // Gunakan slug yang telah dibuat
+    {
+        try {
+            // Validasi input
+            $request->validate([
+                'tglkeluar' => 'required',
+                'bkkode' => 'required',
+                'kdbarang' => 'required',
+                'tujuan' => 'required',
+                'jml' => 'required|numeric',
+                'bmkode' => 'required',
             ]);
+
+            // Ambil harga jual dari database berdasarkan BM Kode yang baru dipilih
+            $barangMasuk = BarangmasukModel::where('bm_kode', $request->bmkode)->first();
+            $hargaJual = $barangMasuk->bm_hargajual;
+
+            $barangMasuk->bm_etalase -= $request->jml;
+            $barangMasuk->save();
+            // Hitung harga total berdasarkan jumlah keluar dan harga jual
+            $hargatotal = $request->jml * $hargaJual;
+
+            // Buat slug dari string tujuan
+            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->tujuan)));
+
+            // Cek apakah data dengan kriteria yang sama sudah ada
+            $existingData = BarangkeluarModel::where('bk_tanggal', $request->tglkeluar)
+                ->where('bk_tujuan', $request->tujuan)
+                ->where('bm_kode', $request->bmkode)
+                ->where('barang_kode', $request->kdbarang)
+                ->first();
+
+            if ($existingData) {
+                // Jika data sudah ada, tambahkan jumlah barang keluar dan total harga
+                $existingData->increment('bk_jumlah', $request->jml);
+                $existingData->increment('bk_totalharga', $hargatotal);
+            } else {
+                // Jika data belum ada, tambahkan data baru
+                BarangkeluarModel::create([
+                    'bk_tanggal' => $request->tglkeluar,
+                    'bk_kode' => $request->bkkode,
+                    'barang_kode' => $request->kdbarang,
+                    'bk_tujuan' => $request->tujuan,
+                    'bk_jumlah' => $request->jml,
+                    'bm_kode' => $request->bmkode,
+                    'bk_totalharga' => $hargatotal,
+                    'bk_slug' => $slug, // Gunakan slug yang telah dibuat
+                ]);
+            }
+
+            return response()->json(['success' => 'Berhasil']);
+        } catch (\Exception $e) {
+            // Tangani kesalahan dan kirim respons error
+            return response()->json(['error' => 'Gagal memproses permintaan. Silakan coba lagi.']);
         }
-
-        return response()->json(['success' => 'Berhasil']);
-    } catch (\Exception $e) {
-        // Tangani kesalahan dan kirim respons error
-        return response()->json(['error' => 'Gagal memproses permintaan. Silakan coba lagi.']);
     }
-}
 
-
-
-public function proses_ubah(Request $request, BarangkeluarModel $barangkeluar)
-{
-    try {
-        // Validasi input
-        $request->validate([
-            'tglkeluar' => 'required',
-            'bkkode' => 'required',
-            'kdbarang' => 'required',
-            'tujuan' => 'required',
-            'jml' => 'required|numeric',
-            'bmkode' => 'required',
-            'harga_jual' => 'required', // tambahkan validasi untuk harga jual
-        ]);
-
-        // Ambil harga jual dari database berdasarkan BM Kode yang baru dipilih
-        $barangMasuk = BarangmasukModel::where('bm_kode', $request->bmkode)->first();
-        $hargaJual = $barangMasuk->bm_hargajual;
-
-        $barangMasuk->bm_etalase += $barangkeluar->bk_jumlah;
-        // Kurangi jumlah barang di etalase
-        $barangMasuk->bm_etalase -= $request->jml;
-        $barangMasuk->save();
-
-        // Hitung harga total berdasarkan perubahan jumlah keluar dan harga jual
-        $hargatotal = $request->jml * $request->harga_jual;
-
-        // Buat slug dari string tujuan
-        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->tujuan)));
-
-        // Cek apakah data dengan kriteria yang sama sudah ada
-        $existingData = BarangkeluarModel::where('bk_tanggal', $request->tglkeluar)
-            ->where('bk_tujuan', $request->tujuan)
-            ->where('bm_kode', $request->bmkode)
-            ->where('barang_kode', $request->kdbarang)
-            ->where('bk_kode', '!=', $request->bkkode)
-            ->first();
-
-        if ($existingData) {
-            // Jika data sudah ada, update jumlah barang keluar dan total harga
-            $existingData->update([
-                'bk_jumlah' => $existingData->bk_jumlah + $request->jml,
-                'bk_totalharga' => $existingData->bk_totalharga + $hargatotal,
-                'bk_slug' => $slug,
+    public function proses_ubah(Request $request, BarangkeluarModel $barangkeluar)
+    {
+        try {
+            // Validasi input
+            $request->validate([
+                'tglkeluar' => 'required',
+                'bkkode' => 'required',
+                'kdbarang' => 'required',
+                'tujuan' => 'required',
+                'jml' => 'required|numeric',
+                'bmkode' => 'required',
+                'harga_jual' => 'required', // tambahkan validasi untuk harga jual
             ]);
 
-            // Hapus data yang sedang diubah
-            $barangkeluar->delete();
-        } else {
-            // Jika data belum ada, update data yang sedang diubah
-            $barangkeluar->update([
-                'bk_tanggal' => $request->tglkeluar,
-                'bk_kode' => $request->bkkode,
-                'barang_kode' => $request->kdbarang,
-                'bk_tujuan'   => $request->tujuan,
-                'bk_jumlah'   => $request->jml,
-                'bm_kode' => $request->bmkode,
-                'bk_totalharga' => $hargatotal, // Perbarui total harga
-                'bk_slug' => $slug,
-            ]);
+            // Ambil harga jual dari database berdasarkan BM Kode yang baru dipilih
+            $barangMasuk = BarangmasukModel::where('bm_kode', $request->bmkode)->first();
+            $hargaJual = $barangMasuk->bm_hargajual;
+
+            $barangMasuk->bm_etalase += $barangkeluar->bk_jumlah;
+            // Kurangi jumlah barang di etalase
+            $barangMasuk->bm_etalase -= $request->jml;
+            $barangMasuk->save();
+
+            // Hitung harga total berdasarkan perubahan jumlah keluar dan harga jual
+            $hargatotal = $request->jml * $request->harga_jual;
+
+            // Buat slug dari string tujuan
+            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->tujuan)));
+
+            // Cek apakah data dengan kriteria yang sama sudah ada
+            $existingData = BarangkeluarModel::where('bk_tanggal', $request->tglkeluar)
+                ->where('bk_tujuan', $request->tujuan)
+                ->where('bm_kode', $request->bmkode)
+                ->where('barang_kode', $request->kdbarang)
+                ->where('bk_kode', '!=', $request->bkkode)
+                ->first();
+
+            if ($existingData) {
+                // Jika data sudah ada, update jumlah barang keluar dan total harga
+                $existingData->update([
+                    'bk_jumlah' => $existingData->bk_jumlah + $request->jml,
+                    'bk_totalharga' => $existingData->bk_totalharga + $hargatotal,
+                    'bk_slug' => $slug,
+                ]);
+
+                // Hapus data yang sedang diubah
+                $barangkeluar->delete();
+            } else {
+                // Jika data belum ada, update data yang sedang diubah
+                $barangkeluar->update([
+                    'bk_tanggal' => $request->tglkeluar,
+                    'bk_kode' => $request->bkkode,
+                    'barang_kode' => $request->kdbarang,
+                    'bk_tujuan'   => $request->tujuan,
+                    'bk_jumlah'   => $request->jml,
+                    'bm_kode' => $request->bmkode,
+                    'bk_totalharga' => $hargatotal, // Perbarui total harga
+                    'bk_slug' => $slug,
+                ]);
+            }
+
+            return response()->json(['success' => 'Berhasil']);
+        } catch (\Exception $e) {
+            // Tangani kesalahan dan kirim respons error
+            return response()->json(['error' => 'Gagal memproses permintaan. Silakan coba lagi.']);
         }
-
-        return response()->json(['success' => 'Berhasil']);
-    } catch (\Exception $e) {
-        // Tangani kesalahan dan kirim respons error
-        return response()->json(['error' => 'Gagal memproses permintaan. Silakan coba lagi.']);
     }
-}
-
-
 
     public function proses_hapus(Request $request, BarangkeluarModel $barangkeluar)
     {

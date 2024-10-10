@@ -3,7 +3,10 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content modal-content-demo">
             <div class="modal-header">
-                <h6 class="modal-title">Tambah Obat Keluar</h6><button aria-label="Close" onclick="reset()" class="btn-close" data-bs-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                <h6 class="modal-title">Tambah Obat Keluar</h6>
+                <button aria-label="Close" onclick="reset()" class="btn-close" data-bs-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -16,82 +19,83 @@
                             <label for="tglkeluar" class="form-label">Tanggal Keluar <span class="text-danger">*</span></label>
                             <input type="text" name="tglkeluar" class="form-control datepicker-date" placeholder="">
                         </div>
-                        <div class="form-group">
-                            <label for="tujuan" class="form-label">Nama Pembeli</label>
-                            <input type="text" name="tujuan" class="form-control" placeholder="">
-                        </div>
+                        
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Kode Obat Masuk <span class="text-danger me-1">*</span>
+                            <div class="form-group">
+                                <label for="tujuan" class="form-label">Nama Pembeli</label>
+                                <input type="text" name="tujuan" class="form-control" placeholder="">
+                            </div>
+                            <label><span class="text-danger me-1"></span>
                                 <input type="hidden" id="status" value="false">
                                 <div class="spinner-border spinner-border-sm d-none" id="loaderkd" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" autocomplete="off" name="bmkode" placeholder="">
-                                <button class="btn btn-primary-light" onclick="searchBarang()" type="button"><i class="fe fe-search"></i></button>
-                                <button class="btn btn-success-light" onclick="modalBarang()" type="button"><i class="fe fe-box"></i></button>
+                            <div class="input-group d-flex justify-content-end mr-3">
+                                
+                            <input type="hidden" class="form-control" autocomplete="off" name="kdbarang" placeholder="">
+                                <button class="btn btn-success" onclick="modalBarang()" type="button">Tambah Obat <i class="fe fe-plus"></i></button>
+                              
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Kode Obat</label>
-                            <input type="text" id="kdbarang" name="kdbarang" class="form-control" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Nama Obat</label>
-                            <input type="text" class="form-control" id="nmbarang" name="nmbarang" readonly>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Satuan</label>
-                                    <input type="text" class="form-control" id="satuan" name="satuan" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Jenis</label>
-                                    <input type="text" class="form-control" id="jenisbarang" name="jenisbarang" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Kategori</label>
-                            <input type="text" class="form-control" id="merk" name="merk"  readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Tanggal Kadaluarsa</label>
-                            <input type="text" id="tglexp" name="tglexp" class="form-control datepicker-date" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Etalase</label>
-                            <input type="text" id="etalase" name="etalase" class="form-control datepicker-date" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Harga Jual (/Satuan)</label>
-                            <input type="text" id="harga_jual" name="harga_jual" class="form-control" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="jml" class="form-label">Jumlah Keluar <span class="text-danger">*</span></label>
-                            <input type="text" name="jml" value="0" class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');" placeholder="">
-                        </div>
-                        <div class="form-group">
-                            <label for="hargatotal" class="form-label">Total Harga</label>
-                            <input type="text" name="hargatotal" value="0" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
 
+                <!-- Tabel dengan scroll vertikal dan horizontal -->
+                <div style="max-height: 300px; overflow-x: auto; overflow-y: 300px;">
+                    <table class="table table-bordered" style="white-space: nowrap;">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Kode Obat</th>
+                                <th style="width: 200px;">Nama Obat</th>
+                                <th style="width: 100px;">Satuan</th>
+                                <th style="width: 150px;">Jenis</th> 
+                                <th style="width: 150px;">Kategori</th>
+                                <th style="width: 150px;">Tanggal Kadaluarsa</th>
+                                <th style="width: 100px;">Etalase</th>
+                                <th style="width: 120px;">Harga Jual (/Satuan)</th>
+                                <th style="width: 120px;">Jumlah Keluar <span class="text-danger">*</span></th>
+                                <th style="width: 120px;">Total Harga</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" id="kdbarang" name="kdbarang" class="form-control" readonly></td>
+                                <td><input type="text" class="form-control" id="nmbarang" name="nmbarang" readonly></td>
+                                <td><input type="text" class="form-control" id="satuan" name="satuan" readonly></td>
+                                <td><input type="text" class="form-control" id="jenisbarang" name="jenisbarang" readonly></td>
+                                <td><input type="text" class="form-control" id="merk" name="merk" readonly></td>
+                                <td><input type="text" id="tglexp" name="tglexp" class="form-control datepicker-date" readonly></td>
+                                <td><input type="text" id="etalase" name="etalase" class="form-control" readonly></td>
+                                <td><input type="text" id="harga_jual" name="harga_jual" class="form-control" readonly></td>
+                                <td>
+                                    <input type="text" name="jml" value="0" class="form-control" 
+                                           oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0'); 
+                                           hitungHargaTotal();" placeholder="">
+                                </td>
+                                <td>
+                                    <input type="text" name="hargatotal" value="0" class="form-control" readonly>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Akhir Tabel -->
+
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary d-none" id="btnLoader" type="button" disabled="">
+                <button class="btn btn-primary d-none" id="btnLoader" type="button" disabled="disabled">
                     <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                     Loading...
                 </button>
-                <a href="javascript:void(0)" onclick="checkForm()" id="btnSimpan" class="btn btn-primary">Simpan <i class="fe fe-check"></i></a>
-                <a href="javascript:void(0)" class="btn btn-light" onclick="reset()" data-bs-dismiss="modal">Batal <i class="fe fe-x"></i></a>
+                <a href="javascript:void(0)" onclick="checkForm()" id="btnSimpan" class="btn btn-primary">
+                    Simpan <i class="fe fe-check"></i>
+                </a>
+                <a href="javascript:void(0)" class="btn btn-light" onclick="reset()" data-bs-dismiss="modal">
+                    Batal <i class="fe fe-x"></i>
+                </a>
             </div>
         </div>
     </div>
