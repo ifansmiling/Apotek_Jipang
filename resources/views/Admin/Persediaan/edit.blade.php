@@ -220,40 +220,47 @@
     }
 
     function submitFormU() {
-        const id = $("input[name='idbmU']").val();
-        const data = {
-            bm_kode: $("input[name='bmkodeU']").val(),
-            tgl_masuk: $("input[name='tglmasukU']").val(),
-            barang_kode: $("input[name='kdbarangU']").val(),
-            customer_id: $("select[name='customerU']").val(),
-            jml_masuk: $("input[name='jmlU']").val(),
-            tgl_kadaluarsa: $("input[name='tglkadaluarsaU']").val(),
-            harga_jual: $("input[name='hargajualU']").val(),
-            harga_beli: $("input[name='hargabeliU']").val(),
-            total_stok: $("input[name='totalstokU']").val(),
-            etalase: $("input[name='etalaseU']").val(),
-            letak_gudang: $("input[name='letakGU']").val(),
-            letak_etalase: $("input[name='letakEU']").val(),
-        };
+    const id = $("input[name='idbmU']").val();
+    const data = {
+        bm_kode: $("input[name='bmkodeU']").val(),
+        tgl_masuk: $("input[name='tglmasukU']").val(),
+        barang_kode: $("input[name='kdbarangU']").val(),
+        customer_id: $("select[name='customerU']").val(),
+        jml_masuk: $("input[name='jmlU']").val(),
+        tgl_kadaluarsa: $("input[name='tglkadaluarsaU']").val(),
+        harga_jual: $("input[name='hargajualU']").val(),
+        harga_beli: $("input[name='hargabeliU']").val(),
+        total_stok: $("input[name='totalstokU']").val(),
+        etalase: $("input[name='etalaseU']").val(),
+        letak_gudang: $("input[name='letakGU']").val(),
+        letak_etalase: $("input[name='letakEU']").val(),
+    };
 
-        $.ajax({
-            type: 'POST',
-            url: "{{ url('admin/persediaan/proses_ubah/data/') }}/" + id,
-            data: data,
-            success: function(response) {
-                if (response.success) {
-                    swal("Berhasil diubah!", "", "success");
-                    $('#Umodaldemo8').modal('toggle');
-                    table.ajax.reload(null, false);
-                    resetU();
-                } else {
-                    swal("Gagal!", "Periksa kembali inputan Anda.", "error");
-                }
-            },
-            error: function() {
-                swal("Terjadi kesalahan!", "Coba lagi nanti.", "error");
+    $.ajax({
+        type: 'POST',
+        url: "{{ url('admin/persediaan/proses_ubah/data/') }}/" + id,
+        data: data,
+        success: function(response) {
+            if (response.success) {
+                swal("Berhasil diubah!", "", "success");
+                $('#Umodaldemo8').modal('toggle');
+                table.ajax.reload(null, false);
+                resetU();
+            } else {
+                swal("Gagal!", "Periksa kembali inputan Anda.", "error");
             }
-        });
-    }
+            // Tampilkan tombol "Simpan Perubahan" dan sembunyikan tombol loader setelah berhasil
+            $("#btnSimpanU").removeClass('d-none');
+            $("#btnLoaderU").addClass('d-none');
+        },
+        error: function() {
+            swal("Terjadi kesalahan!", "Coba lagi nanti.", "error");
+            // Tampilkan tombol "Simpan Perubahan" dan sembunyikan tombol loader jika terjadi kesalahan
+            $("#btnSimpanU").removeClass('d-none');
+            $("#btnLoaderU").addClass('d-none');
+        }
+    });
+}
+
 </script>
 @endsection
