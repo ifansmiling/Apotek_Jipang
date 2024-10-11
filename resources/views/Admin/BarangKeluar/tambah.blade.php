@@ -19,26 +19,20 @@
                             <label for="tglkeluar" class="form-label">Tanggal Keluar <span class="text-danger">*</span></label>
                             <input type="text" name="tglkeluar" class="form-control datepicker-date" placeholder="">
                         </div>
-                        
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <div class="form-group">
-                                <label for="tujuan" class="form-label">Nama Pembeli</label>
-                                <input type="text" name="tujuan" class="form-control" placeholder="">
+                            <label for="tujuan" class="form-label">Nama Pembeli</label>
+                            <input type="text" name="tujuan" class="form-control" placeholder="">
+                        </div>
+                        <label><span class="text-danger me-1"></span>
+                            <input type="hidden" id="status" value="false">
+                            <div class="spinner-border spinner-border-sm d-none" id="loaderkd" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                            <label><span class="text-danger me-1"></span>
-                                <input type="hidden" id="status" value="false">
-                                <div class="spinner-border spinner-border-sm d-none" id="loaderkd" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </label>
-                            <div class="input-group d-flex justify-content-end mr-3">
-                                
-                            <input type="hidden" class="form-control" autocomplete="off" name="kdbarang" placeholder="">
-                                <button class="btn btn-success" onclick="modalBarang()" type="button">Tambah Obat <i class="fe fe-plus"></i></button>
-                              
-                            </div>
+                        </label>
+                        <div class="input-group d-flex justify-content-end mr-3">
+                            <button class="btn btn-success" onclick="modalBarang()" type="button">Tambah Obat <i class="fe fe-plus"></i></button>
                         </div>
                     </div>
                 </div>
@@ -49,6 +43,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 100px;">Kode Obat</th>
+                                <th style="width: 100px;">No Nota</th>
                                 <th style="width: 200px;">Nama Obat</th>
                                 <th style="width: 100px;">Satuan</th>
                                 <th style="width: 150px;">Jenis</th> 
@@ -63,6 +58,7 @@
                         <tbody>
                             <tr>
                                 <td><input type="text" id="kdbarang" name="kdbarang" class="form-control" readonly></td>
+                                <td><input type="text" id="bmkode" name="bmkode" class="form-control" readonly></td>
                                 <td><input type="text" class="form-control" id="nmbarang" name="nmbarang" readonly></td>
                                 <td><input type="text" class="form-control" id="satuan" name="satuan" readonly></td>
                                 <td><input type="text" class="form-control" id="jenisbarang" name="jenisbarang" readonly></td>
@@ -215,7 +211,7 @@
             $("input[name='jml']").addClass('is-invalid');
             setLoading(false);
             return false;
-        } else if (parseFloat(jml) > etalase) { // Periksa jika jumlah melebihi etalase
+        } else if (parseFloat(jml) > etalase) {
             validasi('Jumlah melebihi stok di etalase!', 'warning');
             $("input[name='jml']").addClass('is-invalid');
             setLoading(false);
@@ -225,48 +221,94 @@
         }
     }
 
-
     function submitForm() {
-        const bkkode = $("input[name='bkkode']").val();
-        const tglkeluar = $("input[name='tglkeluar']").val();
-        const kdbarang = $("input[name='kdbarang']").val();
-        const tujuan = $("input[name='tujuan']").val();
-        const jml = $("input[name='jml']").val();
-        const tglexp = $("input[name='tglexp']").val(); // Menambahkan variabel tglexp
-        const harga_jual = $("input[name='harga_jual']").val(); // Menambahkan variabel harga_jual
-        const etalase = $("input[name='etalase']").val();
-        const bmkode = $("input[name='bmkode']").val();
-        const hargatotal = $("input[name='hargatotal']").val();
-        hitungHargaTotal();
+    const bkkode = $("input[name='bkkode']").val();
+    const tglkeluar = $("input[name='tglkeluar']").val();
+    const kdbarang = $("input[name='kdbarang']").val();
+    const tujuan = $("input[name='tujuan']").val();
+    const jml = $("input[name='jml']").val();
+    const tglexp = $("input[name='tglexp']").val(); 
+    const harga_jual = $("input[name='harga_jual']").val();
+    const etalase = $("input[name='etalase']").val();
+    const bmkode = $("input[name='bmkode']").val(); // pastikan bmkode dikirim
+    const hargatotal = $("input[name='hargatotal']").val();
 
-        $.ajax({
-            type: 'POST',
-            url: "{{ route('barang-keluar.store') }}",
-            enctype: 'multipart/form-data',
-            data: {
-                bkkode: bkkode,
-                tglkeluar: tglkeluar,
-                kdbarang: kdbarang,
-                tujuan: tujuan,
-                jml: jml,
-                tglexp: tglexp,
-                harga_jual: harga_jual,
-                etalase: etalase,
-                bmkode: bmkode,
-                hargatotal: hargatotal,
-            },
-            success: function(data) {
-                $('#modaldemo8').modal('toggle');
+    $.ajax({
+        type: 'POST',
+        url: "{{ route('barang-keluar.store') }}",
+        data: {
+            _token: "{{ csrf_token() }}",
+            bkkode: bkkode,
+            tglkeluar: tglkeluar,
+            kdbarang: kdbarang,
+            tujuan: tujuan,
+            jml: jml,
+            tglexp: tglexp,
+            harga_jual: harga_jual,
+            etalase: etalase,
+            bmkode: bmkode, // kirim bmkode
+            hargatotal: hargatotal,
+        },
+        beforeSend: function() {
+            // Sembunyikan tombol simpan dan tampilkan loader
+            $('#btnSimpan').hide();
+            $('#btnLoader').removeClass('d-none');
+        },
+        success: function(data) {
+            if (data.success) {
+                // Tutup modal setelah sukses
+                $('#modaldemo8').modal('toggle'); 
                 swal({
                     title: "Berhasil ditambah!",
                     type: "success"
                 });
+                // Reload tabel data
                 table.ajax.reload(null, false);
-                reset();
+                // Reset form setelah sukses submit
+                resetForm();
+            } else {
+                swal({
+                    title: "Gagal!",
+                    text: data.error,
+                    type: "error"
+                });
             }
+        },
+        error: function(xhr, status, error) {
+            // Tampilkan error jika ada masalah
+            swal({
+                title: "Gagal!",
+                text: 'Gagal memproses permintaan: ' + xhr.responseJSON.message,
+                type: "error"
+            });
+        },
+        complete: function() {
+            // Setelah proses selesai, tampilkan kembali tombol simpan dan sembunyikan loader
+            $('#btnLoader').addClass('d-none');
+            $('#btnSimpan').show();
+        }
         });
     }
-    
+
+    // Fungsi untuk mereset form setelah berhasil submit
+    function resetForm() {
+        $("input[name='bkkode']").val('');
+        $("input[name='tglkeluar']").val('');
+        $("input[name='bmkode']").val('');
+        $("input[name='tujuan']").val('');
+        $("input[name='jml']").val('0');
+        $("input[name='hargatotal']").val('');
+        $("#kdbarang").val('');
+        $("#nmbarang").val('');
+        $("#satuan").val('');
+        $("#jenisbarang").val('');
+        $("#merk").val('');
+        $("#tglexp").val('');    
+        $("#harga_jual").val('');
+        $("#etalase").val('');
+        $("#status").val('false');
+        setLoading(false);
+    }
 
     function resetValid() {
         $("input[name='tglkeluar']").removeClass('is-invalid');
