@@ -182,7 +182,8 @@ class BarangkeluarController extends Controller
 
             return response()->json(['success' => 'Berhasil']);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Gagal memproses permintaan: ' . $e->getMessage()]);
+            // Tangani kesalahan dan kirim respons error
+            return response()->json(['error' => 'Gagal memproses permintaan. Silakan coba lagi.']);
         }
     }
 
