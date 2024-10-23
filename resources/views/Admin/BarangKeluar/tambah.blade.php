@@ -13,11 +13,11 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="bkkode" class="form-label">Kode Obat Keluar <span class="text-danger">*</span></label>
-                            <input type="text" name="bkkode" readonly class="form-control" placeholder="">
+                            <input type="text" name="bkkode" class="form-control" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="tglkeluar" class="form-label">Tanggal Keluar <span class="text-danger">*</span></label>
-                            <input type="text" name="tglkeluar" class="form-control datepicker-date" placeholder="">
+                            <input type="text" name="tglkeluar" readonly class="form-control" value="<?php echo date("d-m-Y"); ?>" placeholder="">
                         </div>
                         
                     </div>
@@ -39,14 +39,22 @@
                                 <button class="btn btn-success" onclick="modalBarang()" type="button">Tambah Obat <i class="fe fe-plus"></i></button>
                               
                             </div>
+<<<<<<< HEAD
+=======
+                        </label>
+                        <div class="input-group d-flex justify-content-end mr-3">
+                            <input type="hidden" class="form-control" autocomplete="off" name="bm_id" placeholder="">
+                            <button class="btn btn-success" onclick="modalBarang()" type="button">Tambah Obat <i class="fe fe-plus"></i></button>
+>>>>>>> 02d7c5665bd24ff38656fa2fc2bc2ca42906123e
                         </div>
                     </div>
                 </div>
 
-                <!-- Tabel dengan scroll vertikal dan horizontal -->
-                <div style="max-height: 300px; overflow-x: auto; overflow-y: 300px;">
-                    <table class="table table-bordered" style="white-space: nowrap;">
+                <div class="card-body">
+                <div class="table-responsive">
+                    <table id="tabelObatKeluar" class="table table-bordered text-nowrap border-bottom dataTable no-footer dtr-inline collapsed">
                         <thead>
+<<<<<<< HEAD
                             <tr>
                                 <th style="width: 100px;">Kode Obat</th>
                                 <th style="width: 200px;">Nama Obat</th>
@@ -79,12 +87,28 @@
                                     <input type="text" name="hargatotal" value="0" class="form-control" readonly>
                                 </td>
                             </tr>
+=======
+                            <th class="border-bottom-0" width="1%">No</th>
+                            <th class="border-bottom-0">bmID</th>
+                            <th class="border-bottom-0">No Nota</th>
+                            <th class="border-bottom-0">Kode Obat</th>
+                            <th class="border-bottom-0">Nama Obat</th>
+                            <th class="border-bottom-0">Satuan</th>
+                            <th class="border-bottom-0">Jenis</th>
+                            <th class="border-bottom-0">Kategori</th>
+                            <th class="border-bottom-0">Tanggal Kadaluarsa</th>
+                            <th class="border-bottom-0">Etalase</th>
+                            <th class="border-bottom-0">Harga Jual (/Satuan)</th>
+                            <th class="border-bottom-0">Jumlah Keluar (/Satuan)</th>
+                            <th class="border-bottom-0">Total Harga</th>
+                            <th class="border-bottom-0">Action</th>
+                        </thead>
+                        <tbody>
+>>>>>>> 02d7c5665bd24ff38656fa2fc2bc2ca42906123e
                         </tbody>
                     </table>
                 </div>
-                <!-- Akhir Tabel -->
-
-            </div>
+            </div> 
             <div class="modal-footer">
                 <button class="btn btn-primary d-none" id="btnLoader" type="button" disabled="disabled">
                     <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
@@ -103,86 +127,138 @@
 
 @section('formTambahJS')
 <script>  
-    $('input[name="bmkode"]').keypress(function(event) {
+    $('input[name="bm_id"]').keypress(function(event) {
         var keycode = (event.keyCode ? event.keyCode : event.which);
-        if (keycode == '13') {
-            getpersediaanbyid($('input[name="bmkode"]').val());
-        }
+            getpersediaanbyid($('input[name="bm_id"]').val());
     });
 
-    
     function modalBarang() {
         $('#modalBarang').modal('show');
-        $('#modaldemo8').addClass('d-none');
+        $('#modaldemo8').addClass('hide');
         $('input[name="param"]').val('tambah');
         resetValid();
         table2.ajax.reload();
     }
 
+    function closeModalBarang() {
+        $('#modalBarang').modal('hide'); 
+    }
+
     function searchBarang() {
-        getpersediaanbyid($('input[name="bmkode"]').val());
+        getpersediaanbyid($('input[name="bm_id"]').val());
         resetValid();
     }
-   
-    function getpersediaanbyid(id) {
-    $("#loaderkd").removeClass('d-none');
+
+    function tambahBarisObat() {
+    // Ambil nilai dari inputan
+        const bmid = $("input[name='bm_id']").val();
+        const existingRow = $("#tabelObatKeluar tbody tr").filter(function() {
+            return $(this).find("td:nth-child(2)").text() === bmid;
+        });
+
+        if(existingRow.length > 0){
+            validasi('Obat sudah ada dalam tabel!', 'warning');                
+        }else{                
+            const barisBaru = $("<tr>");
+            barisBaru.append("<td></td>");
+            barisBaru.append("<td>" + bmid + "</td>");
+            barisBaru.append("<td><input type='text' class='form-control bmkode' name='bmkode[]' readonly></td>");
+            barisBaru.append("<td><input type='text' class='form-control kdbarang' name='kdbarang[]' readonly></td>");
+            barisBaru.append("<td><input type='text' class='form-control nmbarang' name='nmbarang[]' readonly></td>");
+            barisBaru.append("<td><input type='text' class='form-control satuan' name='satuan[]' readonly></td>");
+            barisBaru.append("<td><input type='text' class='form-control jenisbarang' name='jenisbarang[]' readonly></td>");
+            barisBaru.append("<td><input type='text' class='form-control merk' name='merk[]' readonly></td>");
+            barisBaru.append("<td><input type='text' class='form-control tglexp' name='tglexp[]' readonly></td>");
+            barisBaru.append("<td><input type='text' class='form-control etalase' name='etalase[]' readonly></td>");
+            barisBaru.append("<td><input type='text' class='form-control harga_jual' name='harga_jual[]' readonly></td>");
+            barisBaru.append("<td><input type='text' name='jml[]' class='form-control'></td>");
+            barisBaru.append("<td><input type='text' name='hargatotal[]' class='form-control hargatotal' readonly></td>");
+            barisBaru.append("<td><button type='button' class='btn btn-danger' onclick='hapusBaris(this)'>Hapus</button></td>");
+            // Tambahkan baris baru ke tabel
+            $("#tabelObatKeluar").append(barisBaru);
+            updateNomorUrut(); 
+            getpersediaanbyid(bmid, barisBaru);
+            hitungHargaTotal();
+        }
+    }
+
+    function getpersediaanbyid(bmid, barisBaru) {
     $.ajax({
         type: 'GET',
-        url: "{{ url('admin/persediaan/getpersediaan') }}/" + id,
+        url: "{{ url('admin/persediaan/getpersediaan') }}/" + bmid,
         processData: false,
         contentType: false,
         dataType: 'json',
         success: function(data) {
             if (data.length > 0) {
-                $("#loaderkd").addClass('d-none');
-                $("#status").val("true");
-                $("#kdbarang").val(data[0].barang_kode);
-                $("#nmbarang").val(data[0].barang_nama);
-                $("#satuan").val(data[0].satuan_nama);
-                $("#jenisbarang").val(data[0].jenisbarang_nama);
-                $("#merk").val(data[0].merk_nama);
-                $("#tglexp").val(data[0].bm_tglex);
-                $("#harga_jual").val(data[0].bm_hargajual);
-                $("#etalase").val(data[0].bm_etalase);
-
+                console.log(data); // Log data untuk memastikan data berhasil didapat
+                barisBaru.find(".kdbarang").val(data[0].barang_kode);
+                barisBaru.find(".bmkode").val(data[0].bm_kode);
+                barisBaru.find(".nmbarang").val(data[0].barang_nama);
+                barisBaru.find(".satuan").val(data[0].satuan_nama);
+                barisBaru.find(".jenisbarang").val(data[0].jenisbarang_nama);
+                barisBaru.find(".merk").val(data[0].merk_nama);
+                barisBaru.find(".tglexp").val(data[0].bm_tglex);
+                barisBaru.find(".etalase").val(data[0].bm_etalase);
+                barisBaru.find(".harga_jual").val(data[0].bm_hargajual);
             } else {
-                $("#loaderkd").addClass('d-none');
-                $("#status").val("false");
-                $("#kdbarang").val('');
-                $("#nmbarang").val('');
-                $("#satuan").val('');
-                $("#jenisbarang").val('');
-                $("#merk").val('');
-                $("#tglexp").val('');
-                $("#totalstok").val('');
-                $("#etalase").val('');
-                $("#harga_jual").val('');
-                $("#etalase").val('');
+                alert("Data obat tidak ditemukan.");
             }
         }
     });
-}
+    }
 
-    $("input[name='jml']").on('input', function() {
+    function hapusBaris(button) {
+        $(button).closest('tr').remove();
+        updateNomorUrut(); 
+    }
+
+    function updateNomorUrut() {
+        $("#tabelObatKeluar tbody tr").each(function(index) {
+            $(this).find("td:first").text(index + 1);
+        });
+    }
+
+    $("#tabelObatKeluar").on('input', "input[name='jml[]']", function() {
         hitungHargaTotal();
     });
 
-    // Call hitungHargaTotal function when the price input changes
-    $("#harga_jual").on('input', function() {
-        hitungHargaTotal();
-    });
+    function resetTable() {
+     $("#tabelObatKeluar tbody").empty(); 
+    }
 
     // Function to calculate total price
     function hitungHargaTotal() {
-        var jumlahKeluar = parseFloat($("input[name='jml']").val()) || 0;
-        var hargaJual = parseFloat($("#harga_jual").val()) || 0;
+        // Loop through each row in the table
+        $("#tabelObatKeluar tbody tr").each(function() {
+            var jumlahKeluar = parseFloat($(this).find("input[name='jml[]']").val()) || 0;
+            var hargaJual = parseFloat($(this).find("input[name='harga_jual[]']").val()) || 0;
 
-        // Calculate total price
-        var hargatotal = jumlahKeluar * hargaJual;
+            // Calculate total price
+            var hargatotal = jumlahKeluar * hargaJual;
 
-        // Display total price in the total price input
-        $("input[name='hargatotal']").val(hargatotal);
+            // Display total price in the total price input
+            $(this).find("input[name='hargatotal[]']").val(hargatotal);
+        });
     }
+
+    // Event listener untuk input jumlah keluar
+    $("#tabelObatKeluar").on('input', "input[name='jml[]']", function() {
+        const row = $(this).closest('tr'); // Ambil baris saat ini
+        const etalase = parseFloat(row.find("input[name='etalase[]']").val()) || 0; // Ambil nilai etalase dari baris yang bersangkutan
+        const jumlahKeluar = parseFloat($(this).val()) || 0; // Ambil nilai jumlah keluar yang diinputkan
+
+        // Validasi jika jumlah keluar melebihi etalase
+        if (jumlahKeluar > etalase) {
+            validasi('Jumlah melebihi stok di etalase!', 'warning');
+            $(this).val(etalase); // Atur kembali nilai ke etalase jika melebihi
+        }
+
+        // Hitung total harga
+        hitungHargaTotal();
+    });
+
+
 
     function checkForm() {
         const tglkeluar = $("input[name='tglkeluar']").val();
@@ -192,6 +268,7 @@
         const tujuan = $("input[name='tujuan']").val();
         const hargatotal = $("input[name='hargatotal']").val();
         const etalase = parseFloat($("#etalase").val());
+        hitungHargaTotal();
         setLoading(true);
         resetValid();
 
@@ -225,65 +302,132 @@
         }
     }
 
-
     function submitForm() {
-        const bkkode = $("input[name='bkkode']").val();
-        const tglkeluar = $("input[name='tglkeluar']").val();
-        const kdbarang = $("input[name='kdbarang']").val();
-        const tujuan = $("input[name='tujuan']").val();
-        const jml = $("input[name='jml']").val();
-        const tglexp = $("input[name='tglexp']").val(); // Menambahkan variabel tglexp
-        const harga_jual = $("input[name='harga_jual']").val(); // Menambahkan variabel harga_jual
-        const etalase = $("input[name='etalase']").val();
-        const bmkode = $("input[name='bmkode']").val();
-        const hargatotal = $("input[name='hargatotal']").val();
-        hitungHargaTotal();
+    const bkkode = $("input[name='bkkode']").val();
+    const tglkeluar = $("input[name='tglkeluar']").val();
+    const tujuan = $("input[name='tujuan']").val();
 
-        $.ajax({
-            type: 'POST',
-            url: "{{ route('barang-keluar.store') }}",
-            enctype: 'multipart/form-data',
-            data: {
-                bkkode: bkkode,
-                tglkeluar: tglkeluar,
-                kdbarang: kdbarang,
-                tujuan: tujuan,
-                jml: jml,
-                tglexp: tglexp,
-                harga_jual: harga_jual,
-                etalase: etalase,
-                bmkode: bmkode,
-                hargatotal: hargatotal,
-            },
-            success: function(data) {
+    let barangList = [];
+    $("#tabelObatKeluar tbody tr").each(function() {
+        const bmid = $(this).find("td:nth-child(2)").text();
+        const bmkode = $(this).find("input[name='bmkode[]']").val();
+        const kdbarang = $(this).find("input[name='kdbarang[]']").val();
+        const nmbarang = $(this).find("input[name='nmbarang[]']").val();
+        const satuan = $(this).find("input[name='satuan[]']").val();
+        const jenis = $(this).find("input[name='jenisbarang[]']").val();
+        const merk = $(this).find("input[name='merk[]']").val();
+        const tglexp = $(this).find("input[name='tglexp[]']").val();
+        const etalase = $(this).find("input[name='etalase[]']").val();
+        const harga_jual = $(this).find("input[name='harga_jual[]']").val();
+        const jml = $(this).find("input[name='jml[]']").val();
+        const hargatotal = $(this).find("input[name='hargatotal[]']").val();
+
+        barangList.push({
+            bmid: bmid,
+            bmkode: bmkode,
+            kdbarang: kdbarang,
+            nmbarang: nmbarang,
+            satuan: satuan,
+            jenis: jenis,
+            merk: merk,
+            tglexp: tglexp,
+            etalase: etalase,
+            harga_jual: harga_jual,
+            jml: jml,
+            hargatotal: hargatotal
+        });
+    });
+
+    $.ajax({
+        type: 'POST',
+        url: "{{ route('barang-keluar.store') }}",
+        data: {
+            _token: "{{ csrf_token() }}", // Pastikan Anda menyertakan CSRF token di sini
+            bkkode: bkkode,
+            tglkeluar: tglkeluar,
+            tujuan: tujuan,
+            barangList: barangList,
+        },
+        success: function(data) {
+            if(data.success) {
                 $('#modaldemo8').modal('toggle');
                 swal({
                     title: "Berhasil ditambah!",
                     type: "success"
                 });
                 table.ajax.reload(null, false);
+<<<<<<< HEAD
                 reset();
             }
         });
     }
     
+=======
+                resetTable();
+                reset();
+            } else {
+                swal({
+                    title: "Gagal ditambah!",
+                    text: data.error,
+                    type: "error"
+                });
+            }
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText); // Untuk debugging jika terjadi error
+            swal({
+                title: "Error",
+                text: "Terjadi kesalahan pada server!",
+                type: "error"
+            });
+        }
+    });
+}
+
+
+    $.ajax({
+        type: 'POST',
+        url: "{{ route('barang-keluar.store') }}",
+        enctype: 'multipart/form-data',
+        data: {
+            bkkode: bkkode,
+            tglkeluar: tglkeluar,
+            tujuan: tujuan,
+            barangList: barangList,
+        },
+        success: function(data) {
+            $('#modaldemo8').modal('toggle');
+            swal({
+                title: "Berhasil ditambah!",
+                type: "success"
+            });
+            table.ajax.reload(null, false);
+            resetTable();
+            reset();
+        }
+    });
+    
+
+
+>>>>>>> 02d7c5665bd24ff38656fa2fc2bc2ca42906123e
 
     function resetValid() {
         $("input[name='tglkeluar']").removeClass('is-invalid');
-        $("input[name='bmkode']").removeClass('is-invalid');
+        $("input[name='bm_id']").removeClass('is-invalid');
         $("input[name='tujuan']").removeClass('is-invalid');
-        $("input[name='jml']").removeClass('is-invalid');
-        $("input[name='hargatotal']").removeClass('is-invalid');
+        $("input[name='jml[]']").removeClass('is-invalid');
+        $("input[name='hargatotal[]']").removeClass('is-invalid');
     };
 
     function reset() {
         resetValid();
+        resetTable();
         $("input[name='bkkode']").val('');
         $("input[name='tglkeluar']").val('');
-        $("input[name='bmkode']").val('');
+        $("input[name='bm_id']").val('');
         $("input[name='tujuan']").val('');
-        $("input[name='jml']").val('0');
-        $("input[name='hargatotal']").val('');
+        $("input[name='jml[]']").val('0');
+        $("input[name='hargatotal[]']").val('');
         $("#kdbarang").val('');
         $("#nmbarang").val('');
         $("#satuan").val('');
@@ -294,6 +438,12 @@
         $("#etalase").val('');
         $("#status").val('false');
         setLoading(false);
+        const today = new Date();
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+        const yyyy = today.getFullYear();
+        const formattedDate = dd + '-' + mm + '-' + yyyy;
+        $("input[name='tglkeluar']").val(formattedDate);
     }
 
     function setLoading(bool) {
