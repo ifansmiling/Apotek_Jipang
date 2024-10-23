@@ -13,7 +13,7 @@
                         <thead>
                             <th class="border-bottom-0" width="1%">No</th>
                             <th class="border-bottom-0">Gambar</th>
-                            <th class="border-bottom-0">Kode Obat Masuk</th>
+                            <th class="border-bottom-0">No Nota</th>
                             <th class="border-bottom-0">Kode Obat</th>
                             <th class="border-bottom-0">Nama Obat</th>
                             <th class="border-bottom-0">Satuan</th>
@@ -50,6 +50,7 @@
     }
 
     function pilihBarang(data) {
+        console.log(data);
         if (data.bm_etalase <= 0) {
             validasi('Etalase kosong. Isi terlebih dahulu sebelum melanjutkan.', 'warning');
             setLoading(false);
@@ -61,7 +62,8 @@
         }
         const key = $("#randkey").val();
         $("#status").val("true");
-        $("input[name='bmkode']").val(data.bm_kode);
+        $("input[name='bm_id']").val(data.bm_id);
+        $("#bmkode").val(data.bm_kode.replace(/_/g, ' '));
         $("#kdbarang").val(data.barang_kode.replace(/_/g, ' '));
         $("#nmbarang").val(data.barang_nama.replace(/_/g, ' '));
         $("#satuan").val(data.satuan_nama.replace(/_/g, ' '));
@@ -71,6 +73,7 @@
         $("#totalstok").val(data.bm_stok.replace(/_/g, ' '));
         $("#etalase").val(data.bm_etalase.replace(/_/g, ' '));
         $("#harga_jual").val(data.bm_hargajual.replace(/_/g, ' '));
+        tambahBarisObat();
         $('#modaldemo8').removeClass('d-none');
         $('#modalBarang').modal('hide');
     }
@@ -92,7 +95,8 @@
         }
         const key = $("#randkey").val();
         $("#statusU").val("true");
-        $("input[name='bmkodeU']").val(data.bm_kode);
+        $("input[name='bm_idU']").val(data.bm_id);
+        $("#bmkodeU").val(data.bm_kode.replace(/_/g, ' '));
         $("#kdbarangU").val(data.barang_kode.replace(/_/g, ' '));
         $("#nmbarangU").val(data.barang_nama.replace(/_/g, ' '));
         $("#satuanU").val(data.satuan_nama.replace(/_/g, ' '));

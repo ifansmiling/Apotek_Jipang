@@ -37,17 +37,6 @@
                                 <th class="border-bottom-0">Tanggal Keluar</th>
                                 <th class="border-bottom-0">Kode Obat Keluar</th>
                                 <th class="border-bottom-0">Nama Pembeli</th>
-                                <th class="border-bottom-0">Kode Obat Masuk</th>
-                                <th class="border-bottom-0">Kode Obat</th>
-                                <th class="border-bottom-0">Obat</th>
-                                <th class="border-bottom-0">Satuan</th>
-                                <th class="border-bottom-0">Jenis</th>
-                                <th class="border-bottom-0">Kategori</th>
-                                <th class="border-bottom-0">Tanggal Kadaluarsa</th>
-                                <th class="border-bottom-0">Etalase</th>
-                                <th class="border-bottom-0">Jumlah Keluar</th>
-                                <th class="border-bottom-0">Harga Jual</th>
-                                <th class="border-bottom-0">Total Harga</th>
                                 <th class="border-bottom-0" width="1%">Action</th>
                             </thead>
                             <tbody></tbody>
@@ -66,13 +55,13 @@
 
     <script>
         function generateID() {
-            id = new Date().getTime();
-            $("input[name='bkkode']").val("BK-" + id);
+            $("input[name='bkkode']").val();
         }
 
         function update(data) {
             $("input[name='idbkU']").val(data.bk_id);
             $("input[name='bkkodeU']").val(data.bk_kode);
+            $("input[name='bmidU']").val(data.bm_id);
             $("input[name='bmkodeU']").val(data.bm_kode);
             $("input[name='kdbarangU']").val(data.barang_kode);
             $("input[name='jmlU']").val(data.bk_jumlah);
@@ -83,7 +72,7 @@
             $("input[name='etalaseU']").val(data.bm_etalase); 
             $("input[name='hargatotalU']").val(data.bk_totalharga); 
             
-            getpersediaanbyidU(data.bm_kode);
+            getpersediaanbyidU(data.bm_id);
         }
 
         function hapus(data) {
@@ -132,7 +121,8 @@
                     "url": "{{ route('barang-keluar.getbarang-keluar') }}",
                 },
 
-                "columns": [{
+                "columns": [
+                    {
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         searchable: false
@@ -150,50 +140,6 @@
                         name: 'bk_tujuan',
                     },
                     {
-                        data: 'bm_kode',
-                        name: 'bm_kode',
-                    },
-                    {
-                        data: 'barang_kode',
-                        name: 'barang_kode',
-                    },
-                    {
-                        data: 'barang',
-                        name: 'barang_nama',
-                    },
-                    {
-                        data: 'satuan',
-                        name: 'satuan_nama',
-                    },
-                    {
-                        data: 'jenisbarang',
-                        name: 'jenisbarang_nama',
-                    },
-                    {
-                        data: 'merk',
-                        name: 'merk_nama',
-                    },
-                    {
-                        data: 'tglexp',
-                        name: 'bm_tglex',
-                    },
-                    {
-                        data: 'etalase',
-                        name: 'bm_etalase',
-                    },
-                    {
-                        data: 'bk_jumlah',
-                        name: 'bk_jumlah',
-                    },
-                    {
-                        data: 'harga_jual',
-                        name: 'bm_hargajual',
-                    },
-                    {
-                        data: 'hargatotal',
-                        name: 'bk_totalharga',
-                    },
-                    {
                         data: 'action',
                         name: 'action',
                         orderable: false,
@@ -203,5 +149,6 @@
 
             });
         });
+
     </script>
 @endsection

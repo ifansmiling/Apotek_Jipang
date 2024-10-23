@@ -177,7 +177,7 @@ class PersediaanController extends Controller
                 ->leftJoin('tbl_satuan', 'tbl_satuan.satuan_id', '=', 'tbl_barang.satuan_id')
                 ->leftJoin('tbl_jenisbarang', 'tbl_jenisbarang.jenisbarang_id', '=', 'tbl_barang.jenisbarang_id')
                 ->leftJoin('tbl_merk', 'tbl_merk.merk_id', '=', 'tbl_barang.merk_id')
-                ->orderBy('bm_kode', 'DESC')
+                ->orderBy('bm_id', 'DESC')
                 ->get();
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -221,6 +221,7 @@ class PersediaanController extends Controller
                 })
                 ->addColumn('action', function ($row) use ($request) {
                     $array = [
+                        "bm_id" => $row->bm_id,
                         "bm_kode" => $row->bm_kode,
                         "barang_kode" => $row->barang_kode,
                         "barang_nama" => trim(preg_replace('/[^A-Za-z0-9-]+/', '_', $row->barang_nama)),
@@ -251,10 +252,9 @@ class PersediaanController extends Controller
             ->leftJoin('tbl_satuan', 'tbl_satuan.satuan_id', '=', 'tbl_barang.satuan_id')
             ->leftJoin('tbl_jenisbarang', 'tbl_jenisbarang.jenisbarang_id', '=', 'tbl_barang.jenisbarang_id')
             ->leftJoin('tbl_merk', 'tbl_merk.merk_id', '=', 'tbl_barang.merk_id')
-            ->where('tbl_barangmasuk.bm_kode', $id)
-            ->orderBy('bm_kode', 'DESC')
+            ->where('tbl_barangmasuk.bm_id', $id)
+            ->orderBy('bm_id', 'DESC')
             ->get();
-        
         return response()->json($data);
     }   
 

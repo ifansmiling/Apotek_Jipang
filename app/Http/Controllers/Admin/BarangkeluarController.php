@@ -92,6 +92,7 @@ class BarangkeluarController extends Controller
                     $array = array(
                         "bk_id" => $row->bk_id,
                         "bk_kode" => $row->bk_kode,
+                        "bm_id" => $row->bm_id,
                         "bm_kode" => $row->bm_kode,
                         "barang_kode" => $row->barang_kode,
                         "bk_tanggal" => $row->bk_tanggal,
@@ -131,60 +132,58 @@ class BarangkeluarController extends Controller
     }
 
     public function proses_tambah(Request $request)
-    {
-        try {
-            // Validasi input
-            $request->validate([
-                'tglkeluar' => 'required',
-                'bkkode' => 'required',
-                'kdbarang' => 'required',
-                'tujuan' => 'required',
-                'jml' => 'required|numeric',
-                'bmkode' => 'required',
-            ]);
+{
+    try {
+        $tglkeluar = $request->tglkeluar;
+        $bkkode = $request->bkkode;
+        $tujuan = $request->tujuan;
 
-            // Ambil harga jual dari database berdasarkan BM Kode yang baru dipilih
-            $barangMasuk = BarangmasukModel::where('bm_kode', $request->bmkode)->first();
-            $hargaJual = $barangMasuk->bm_hargajual;
-
-            $barangMasuk->bm_etalase -= $request->jml;
-            $barangMasuk->save();
-            // Hitung harga total berdasarkan jumlah keluar dan harga jual
-            $hargatotal = $request->jml * $hargaJual;
-
-            // Buat slug dari string tujuan
-            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->tujuan)));
-
-            // Cek apakah data dengan kriteria yang sama sudah ada
-            $existingData = BarangkeluarModel::where('bk_tanggal', $request->tglkeluar)
-                ->where('bk_tujuan', $request->tujuan)
-                ->where('bm_kode', $request->bmkode)
-                ->where('barang_kode', $request->kdbarang)
-                ->first();
-
-            if ($existingData) {
-                // Jika data sudah ada, tambahkan jumlah barang keluar dan total harga
-                $existingData->increment('bk_jumlah', $request->jml);
-                $existingData->increment('bk_totalharga', $hargatotal);
-            } else {
-                // Jika data belum ada, tambahkan data baru
-                BarangkeluarModel::create([
-                    'bk_tanggal' => $request->tglkeluar,
-                    'bk_kode' => $request->bkkode,
-                    'barang_kode' => $request->kdbarang,
-                    'bk_tujuan' => $request->tujuan,
-                    'bk_jumlah' => $request->jml,
-                    'bm_kode' => $request->bmkode,
-                    'bk_totalharga' => $hargatotal,
-                    'bk_slug' => $slug, // Gunakan slug yang telah dibuat
-                ]);
+        foreach ($request->barangList as $item) {
+            if (empty($item['bmid']) || empty($item['kdbarang']) || empty($item['jml'])) {
+                return response()->json(['error' => 'Data barang tidak lengkap!']);
             }
 
-            return response()->json(['success' => 'Berhasil']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Gagal memproses permintaan: ' . $e->getMessage()]);
+            $barangMasuk = BarangmasukModel::where('bm_id', $item['bmid'])->first();
+            if (!$barangMasuk) {
+                return response()->json(['error' => 'Barang dengan BM ID ' . $item['bmid'] . ' tidak ditemukan!']);
+            }
+
+            if ($barangMasuk->bm_etalase < $item['jml']) {
+                return response()->json(['error' => 'Stok di etalase untuk barang ' . $item['nmbarang'] . ' tidak mencukupi!']);
+            }
+
+            $barangMasuk->bm_etalase -= $item['jml'];
+            $barangMasuk->save();
+
+            $hargatotal = $item['jml'] * $barangMasuk->bm_hargajual;
+            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->tujuan)));
+
+            BarangkeluarModel::create([
+                'bk_tanggal' => $tglkeluar,
+                'bk_kode' => $bkkode,
+                'bk_tujuan' => $tujuan,
+                'bm_id' => $item['bmid'],
+                'bm_kode' => $item['bmkode'],
+                'barang_kode' => $item['kdbarang'],
+                'barang_nama' => $item['nmbarang'],
+                'satuan_nama' => $item['satuan'],
+                'jenis_nama' => $item['jenis'],
+                'merk_nama' => $item['merk'],
+                'bm_tglex' => $item['tglexp'],
+                'bm_hargajual' => $item['harga_jual'],
+                'bk_jumlah' => $item['jml'],
+                'bk_totalharga' => $hargatotal,
+                'bk_slug' => $slug,
+            ]);
         }
+
+        return response()->json(['success' => 'Berhasil ditambah!']);
+    } catch (Exception $e) {
+        return response()->json(['error' => $e->getMessage()]);
     }
+}
+
+    
 
     public function proses_ubah(Request $request, BarangkeluarModel $barangkeluar)
     {

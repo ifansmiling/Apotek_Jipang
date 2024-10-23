@@ -122,62 +122,36 @@
         getbarangbyid($('input[name="kdbarang"]').val());
         resetValid();
     }
-    function getbarangbyid(id) {
-        $("#loaderkd").removeClass('d-none'); 
-        $.ajax({
-            type: 'GET',
-            url: "{{ url('admin/barang/getbarang') }}/" + id,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function(data) {
-                if (data.length > 0) {
-                    $("#loaderkd").addClass('d-none'); 
-                    $("#status").val("true"); 
-                    $("#nmbarang").val(data[0].barang_nama); 
-                    $("#satuan").val(data[0].satuan_nama); 
-                    $("#jenis").val(data[0].jenisbarang_nama); 
-                    $("#merk").val(data[0].merk_nama); 
-                } else {
-                    $("#loaderkd").addClass('d-none'); 
-                    $("#status").val("false"); 
-                    $("#nmbarang").val(''); 
-                    $("#satuan").val(''); 
-                    $("#jenis").val(''); 
-                    $("#merk").val(''); 
-                }
-            }
-        });
-    }
-
+   
     function tambahDataKeTabel() {
-        const kdbarang = $("input[name='kdbarang']").val();
-        const existingRow = $("#table-3 tbody tr").filter(function() {
-            return $(this).find("td:nth-child(2)").text() === kdbarang;
-        });
+                const kdbarang = $("input[name='kdbarang']").val();
+                const existingRow = $("#table-3 tbody tr").filter(function() {
+                    return $(this).find("td:nth-child(2)").text() === kdbarang;
+                });
 
-        if(existingRow.length > 0){
-            validasi('Obat sudah ada dalam tabel!', 'warning');
-        }else{
-            const newRow = $("<tr>");
-newRow.append("<td></td>");
-newRow.append("<td>" + kdbarang + "</td>");
-newRow.append("<td><input type='text' class='form-control nmbarang' name='nmbarang[]' readonly></td>");
-newRow.append("<td><input type='text' class='form-control satuan' name='satuan[]' readonly></td>");
-newRow.append("<td><input type='text' class='form-control jenis' name='jenis[]' readonly></td>");
-newRow.append("<td><input type='text' class='form-control merk' name='merk[]' readonly></td>");
-newRow.append("<td><input type='date' name='tglkadaluarsa[]' class='form-control datepicker-date' value=''></td>");
-newRow.append("<td><input type='text' name='jml[]' class='form-control'></td>");
-newRow.append("<td><input type='text' name='hargajual[]' class='form-control'></td>");
-newRow.append("<td><input type='text' name='hargabeli[]' class='form-control'></td>");
-newRow.append("<td><input type='text' name='totalharga[]' class='form-control totalharga' readonly></td>");
-newRow.append("<td><button type='button' class='btn btn-danger' onclick='hapusBaris(this)'>Hapus</button></td>");
-$("#table-3 tbody").append(newRow);
-            updateNomorUrut();
-            fillDataFromAjax(kdbarang, newRow);
-            hitungTotalHarga();
-        }
+                if(existingRow.length > 0){
+                    validasi('Obat sudah ada dalam tabel!', 'warning');
+                }else{
+                    const newRow = $("<tr>");
+                    newRow.append("<td></td>");
+                    newRow.append("<td>" + kdbarang + "</td>");
+                    newRow.append("<td><input type='text' class='form-control nmbarang' name='nmbarang[]' readonly></td>");
+                    newRow.append("<td><input type='text' class='form-control satuan' name='satuan[]' readonly></td>");
+                    newRow.append("<td><input type='text' class='form-control jenis' name='jenis[]' readonly></td>");
+                    newRow.append("<td><input type='text' class='form-control merk' name='merk[]' readonly></td>");
+                    newRow.append("<td><input type='date' name='tglkadaluarsa[]' class='form-control datepicker-date' value=''></td>");
+                    newRow.append("<td><input type='text' name='jml[]' class='form-control'></td>");
+                    newRow.append("<td><input type='text' name='hargajual[]' class='form-control'></td>");
+                    newRow.append("<td><input type='text' name='hargabeli[]' class='form-control'></td>");
+                    newRow.append("<td><input type='text' name='totalharga[]' class='form-control totalharga' readonly></td>");
+                    newRow.append("<td><button type='button' class='btn btn-danger' onclick='hapusBaris(this)'>Hapus</button></td>");
+                    $("#table-3 tbody").append(newRow);
+                    updateNomorUrut();
+                    fillDataFromAjax(kdbarang, newRow);
+                    hitungTotalHarga();
+                }
     }
+
     function fillDataFromAjax(kdbarang, newRow) {
         $.ajax({
             type: 'GET',
@@ -217,7 +191,7 @@ $("#table-3 tbody").append(newRow);
     });
 
     function resetTable() {
-    $("#table-3 tbody").empty(); 
+     $("#table-3 tbody").empty(); 
     }
 
 
